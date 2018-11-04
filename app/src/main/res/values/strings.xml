@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_title">VLC-Receiver</string>
+    <string name="app_name">VLC-Receiver</string>
+    <string name="refreshing">Refreshing...</string>
+    <string name="mobius_address">192.168.0.135</string>
+    <string name="addr_unset">Try to connect</string>
+    <string name="addr_set">Connected</string>
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:color="@android:color/holo_blue_light"
+    tools:targetApi="lollipop">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/holo_blue_dark" />
+        </shape>
+    </item>
+</ripple>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<ripple xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:color="@android:color/holo_blue_light"-->
+    <!--tools:targetApi="lollipop">-->
+    <!--<item android:id="@android:id/mask">-->
+        <!--<shape android:shape="rectangle">-->
+            <!--<solid android:color="@android:color/holo_blue_dark" />-->
+            <!--<corners android:radius="1dp" />-->
+        <!--</shape>-->
+    <!--</item>-->
+<!--</ripple>-->
+
+
+<!--<item android:id="@android:id/background">-->
+<!--<shape android:shape="rectangle">-->
+    <!--<gradient-->
+        <!--android:angle="90"-->
+        <!--android:endColor="@color/colorAccent"-->
+        <!--android:startColor="@color/colorPrimary"-->
+        <!--android:type="linear" />-->
+    <!--<corners android:radius="50dp" />-->
+<!--</shape>-->
+<!--</item>-->

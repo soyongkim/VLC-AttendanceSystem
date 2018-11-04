@@ -1,0 +1,4 @@
+include ':app', ':sweetalert', 'usbSerialForAndroid'
+project(':sweetalert').projectDir = new File('app/libs/sweetalert')
+
+
