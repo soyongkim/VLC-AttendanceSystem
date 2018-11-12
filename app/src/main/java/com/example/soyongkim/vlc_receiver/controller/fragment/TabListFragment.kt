@@ -37,7 +37,7 @@ class TabListFragment : Fragment() {
         this.adapter.addItem(Student("Donald", "2016113067"))
         this.adapter.addItem(Student("Gabriel", "2016112530"))
         this.adapter.addItem(Student("Martin", "2014105004"))
-        this.adapter.addItem(Student("Michael", "2013097010"))
+        this.adapter.addItem(Student("Albert", "2013097010"))
         this.adapter.addItem(Student("Robert", "2013105016"))
         this.adapter.addItem(Student("Sabastian", "2014105019"))
         this.adapter.addItem(Student("Wallace", "2014105022"))

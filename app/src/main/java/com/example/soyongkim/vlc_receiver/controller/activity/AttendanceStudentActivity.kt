@@ -20,7 +20,6 @@ class AttendanceStudentActivity : AppCompatActivity() {
 
     private lateinit var anim : Animation
     private lateinit var bAnim : AlphaAnimation
-
     private lateinit var sPort: UsbSerialPort
 
     override fun onCreate(savedInstanceState: Bundle?) {
