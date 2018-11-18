@@ -1,24 +1,16 @@
 package com.example.soyongkim.vlc_receiver.controller.activity
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.util.AttributeSet
-import android.util.Log
-import android.view.MotionEvent
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 
 import com.example.soyongkim.vlc_receiver.R
 import com.example.soyongkim.vlc_receiver.controller.component.adapter.PagerAdapter
-import com.example.soyongkim.vlc_receiver.model.item.UsbSingleton
 import com.example.soyongkim.vlc_receiver.view.CustomViewPager
-import com.hoho.android.usbserial.driver.UsbSerialPort
 
 class AttendanceAdminActivity : AppCompatActivity() {
 
@@ -27,8 +19,6 @@ class AttendanceAdminActivity : AppCompatActivity() {
     private lateinit var tabLayout: TabLayout
     private lateinit var adapter: PagerAdapter
     private lateinit var viewPager: CustomViewPager
-
-    private lateinit var sPort: UsbSerialPort
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,20 +53,10 @@ class AttendanceAdminActivity : AppCompatActivity() {
 
             }
         })
-
-        try {
-            sPort = UsbSingleton.getUsbPort()
-            Toast.makeText(this, "Check: " + sPort?.driver?.device?.deviceName, Toast.LENGTH_SHORT).show()
-        } catch (e:Exception) {
-            Toast.makeText(this, "Error:$e", Toast.LENGTH_LONG).show()
-        }
-
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        Log.d(TAG, "onDestory() 실행")
     }
 
     fun setSwipeable(swipeable: Boolean) {

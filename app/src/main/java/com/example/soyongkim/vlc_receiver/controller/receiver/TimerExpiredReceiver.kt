@@ -15,7 +15,6 @@ class TimerExpiredReceiver : BroadcastReceiver() {
 
         //when alarm manager is counting and finished,
         Toast.makeText(context, "Time out by Alarm manager", Toast.LENGTH_SHORT).show()
-
         PrefUtil.setTimerState(TabMainFragment.TimerState.Stopped, context)
         PrefUtil.setAlarmSetTime(0, context)
     }

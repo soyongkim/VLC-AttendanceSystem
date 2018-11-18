@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:elevation="6dp"
         android:minHeight="?attr/actionBarSize"
-        app:tabIndicatorColor="@color/colorMain"/>
+        app:tabIndicatorColor="@color/colorAttendance"/>
         <!--android:background="?attr/colorPrimary"/>-->
 
     <com.example.soyongkim.vlc_receiver.view.CustomViewPager

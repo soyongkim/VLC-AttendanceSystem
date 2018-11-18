@@ -19,4 +19,6 @@ public class TypeChangeUtil {
 
         return ((s1 << 24) + (s2 << 16) + (s3 << 8) + (s4 << 0));
     }
+
+
 }

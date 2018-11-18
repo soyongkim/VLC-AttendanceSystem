@@ -39,7 +39,7 @@ class InitActivity : AppCompatActivity() {
                 Timer().schedule(object : TimerTask(){
                     override fun run() {
                         this@InitActivity.run {
-                            val intent = Intent(this, DeviceListActivity::class.java)
+                            val intent = Intent(this, SelectModeActivity::class.java)
                             startActivity(intent)
                             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                         }
@@ -62,7 +62,6 @@ class InitActivity : AppCompatActivity() {
         }else {
             mHandler.sendMessage(mHandler.obtainMessage(InitActivity.MOVE))
         }
-
     }
 
     private fun handleGetFail() {
@@ -74,46 +73,22 @@ class InitActivity : AppCompatActivity() {
 
     fun onClick(view: View) {
         HttpRequestService.cseBase = CSEBase(edit_ipAddress.text.toString(), "7579", "Mobius")
-
         dialog = SweetAlertDialog(this@InitActivity, SweetAlertDialog.FINGER_TYPE)
         dialog!!.titleText = "Search"
         dialog!!.contentText = "Searching for VLC-Manager..."
-//        HttpRequestService.getObject().httpRequestWithHandler(this, "GET",
-//                "/list_student",
-//                object : HttpResponseEventRouter {
-//                    override fun route(context: Context, code: Int, arg: String) {
-//                        this@InitActivity.runOnUiThread {
-//                            if(code == 200) {
-//                                Toast.makeText(context, arg, Toast.LENGTH_SHORT).show()
-//                                mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.GET_SUCCESS), 1000)
-//                            }
-//                            else {
-//                                //Toast.makeText(context, arg, Toast.LENGTH_SHORT).show()
-//                                mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.GET_FAIL), 1000)
-//                            }
-//                        }
-//
-//                    }
-//                })
-        var query : String = "<sid>2018220889</sid><key>1111</key>"
-        HttpRequestService.getObject().httpRequestWithHandler(this, "POST",
-                "/cnt-ps-key", query , 4,
+        HttpRequestService.getObject().httpRequestWithHandler(this, "GET",
+                "",
                 object : HttpResponseEventRouter {
                     override fun route(context: Context, code: Int, arg: String) {
                         this@InitActivity.runOnUiThread {
-                            if(code == 201 || code == 202) {
-                                Toast.makeText(context, arg, Toast.LENGTH_SHORT).show()
+                            if(code == 200)
                                 mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.GET_SUCCESS), 1000)
-                            }
-                            else {
-                                //Toast.makeText(context, arg, Toast.LENGTH_SHORT).show()
-                                mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.GET_FAIL), 1000)
-                            }
-                        }
 
+                            else
+                                mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.GET_FAIL), 1000)
+                        }
                     }
                 })
-
         Timer().schedule(object : TimerTask() {
             override fun run() {
                 runOnUiThread {
@@ -133,7 +108,6 @@ class InitActivity : AppCompatActivity() {
 
         var intent = Intent(this, HttpRequestService::class.java)
         startService(intent)
-
     }
 
     override fun onResume() {

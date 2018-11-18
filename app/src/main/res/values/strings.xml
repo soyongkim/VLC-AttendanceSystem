@@ -5,4 +5,7 @@
     <string name="mobius_address">192.168.0.135</string>
     <string name="addr_unset">Try to connect</string>
     <string name="addr_set">Connected</string>
+    <string name="student_id">Enter Your ID</string>
+    <string name="password">Enter Your Password</string>
+    <string name="login_title">Student Login</string>
 </resources>

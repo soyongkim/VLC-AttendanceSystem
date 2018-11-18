@@ -2,7 +2,7 @@ package com.example.soyongkim.vlc_receiver.model.item
 
 import com.example.soyongkim.vlc_receiver.R
 
-class Student(private var _Name: String, private var _StudentNum : String) {
+class Student(private var _Name: String, private var _StudentNum : String, private var _state : String) {
     var Name
         get() = _Name
         set(value) {
@@ -31,9 +31,15 @@ class Student(private var _Name: String, private var _StudentNum : String) {
         }
 
 
-    val cateImage : Int
+    var state
+        get() = _state
+        set(value){
+            _state = value
+        }
+
+    val checkImage : Int
         get(){
-            return if(_StudentNum == "2018220889") R.mipmap.cate_check
+            return if(_state == "o") R.mipmap.cate_check
             else R.mipmap.cate_nocheck
         }
 }

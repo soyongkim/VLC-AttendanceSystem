@@ -16,7 +16,7 @@ class TestActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.element_circular_progress_bar)
+        setContentView(R.layout.activity_dialog_circular_progress_bar)
 
         mprogressBar = findViewById(R.id.circular_progress_bar)
     }

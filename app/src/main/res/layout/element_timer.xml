@@ -24,7 +24,7 @@
         style="@style/Widget.MaterialProgressBar.ProgressBar"
         android:progressBackgroundTintMode="add"
         android:progressBackgroundTint="@color/black_overlay"
-        android:progressTint="@color/colorMain"
+        android:progressTint="@color/colorAttendance"
         android:minWidth="306dp"
         android:minHeight="306dp"
         android:layout_width="wrap_content"

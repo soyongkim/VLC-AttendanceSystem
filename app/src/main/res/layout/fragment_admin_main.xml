@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_margin="@dimen/fab_bigger_margin"
-        android:backgroundTint="@color/colorMain"
+        android:backgroundTint="@color/colorAttendance"
         app:borderWidth="0dp"
         app:srcCompat="@drawable/ic_stop" />
 
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_bigger_margin"
-        android:backgroundTint="@color/colorMain"
+        android:backgroundTint="@color/colorAttendance"
         app:borderWidth="0dp"
         app:srcCompat="@drawable/ic_settings" />
 
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:layout_margin="@dimen/fab_bigger_margin"
-        android:backgroundTint="@color/colorMain"
+        android:backgroundTint="@color/colorAttendance"
         app:borderWidth="0dp"
         app:srcCompat="@drawable/ic_play_arrow" />
 

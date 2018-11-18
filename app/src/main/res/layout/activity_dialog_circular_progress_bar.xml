@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/circular_progress_bar"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateTint="@color/colorProgress" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/success_frame"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="5dp"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/success_bow"/>
+
+        <View
+            android:id="@+id/mask_right"
+            android:layout_width="35dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="-13dp"
+            android:layout_gravity="right"
+            android:background="@android:color/white"/>
+
+        <View
+            android:id="@+id/mask_left"
+            android:layout_width="21dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="-3dp"
+            android:layout_gravity="left"
+            android:background="@android:color/white"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/success_circle"/>
+
+        <cn.pedant.sweetalert.SuccessTickView
+            android:id="@+id/success_tick"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
+</LinearLayout>

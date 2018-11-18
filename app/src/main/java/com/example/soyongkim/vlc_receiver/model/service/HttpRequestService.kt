@@ -25,7 +25,6 @@ class HttpRequestService : Service(){
             return HttpRequestService.thisPointer
         }
 
-        lateinit var userType : String
         lateinit var cseBase : CSEBase
     }
 

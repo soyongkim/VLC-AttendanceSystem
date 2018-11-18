@@ -60,7 +60,7 @@ class DeviceListActivity : AppCompatActivity() {
         this.recyclerView.setHasFixedSize(true)
 
         mUsbManager = getSystemService(Context.USB_SERVICE) as UsbManager
-        mProgressBar = findViewById(R.id.progressBar) as ProgressBar
+        mProgressBar = findViewById(R.id.progressBar)
 
         this.recyclerView.adapter = this.mAdapter
         this.recyclerView.layoutManager = this.layoutManager

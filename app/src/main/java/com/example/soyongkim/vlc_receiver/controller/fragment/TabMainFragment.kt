@@ -1,35 +1,32 @@
 package com.example.soyongkim.vlc_receiver.controller.fragment
 
 import android.app.AlarmManager
-import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import com.example.soyongkim.vlc_receiver.R
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
 import android.support.annotation.RequiresApi
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import com.example.soyongkim.vlc_receiver.controller.receiver.TimerExpiredReceiver
 import com.example.soyongkim.vlc_receiver.controller.util.*
 import kotlinx.android.synthetic.main.element_timer.*
 import kotlinx.android.synthetic.main.fragment_admin_main.*
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import java.io.Serializable
 import java.util.*
-import android.support.v4.view.accessibility.AccessibilityEventCompat.setAction
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import com.example.soyongkim.vlc_receiver.controller.activity.AttendanceAdminActivity
-import kotlinx.android.synthetic.main.activity_custom_snack_bar.*
+import com.example.soyongkim.vlc_receiver.model.service.HttpRequestService
+import com.example.soyongkim.vlc_receiver.view.ProgressDialog
 
 
 class TabMainFragment : Fragment() {
@@ -55,6 +52,11 @@ class TabMainFragment : Fragment() {
 
         val nowSeconds: Long
             get() = Calendar.getInstance().timeInMillis / 1000
+
+        const val MOVE = 0
+        const val SUCCESS_START = 1
+        const val SUCCESS_STOP = 2
+        const val FAIL = 3
     }
 
     enum class TimerState : Serializable {
@@ -69,6 +71,94 @@ class TabMainFragment : Fragment() {
     private lateinit var btn_start: FloatingActionButton
     private lateinit var btn_stop: FloatingActionButton
     private lateinit var btn_setting: FloatingActionButton
+    private var dialog: ProgressDialog? = null
+
+    private var mHandler = Handler() {
+        when (it.what) {
+            TabMainFragment.MOVE -> {
+                if(dialog != null) {
+                    dialog!!.dismiss()
+                    dialog = null
+                }
+            }
+            TabMainFragment.SUCCESS_START -> handleGetSuccess("start")
+            TabMainFragment.SUCCESS_STOP -> handleGetSuccess("stop")
+            TabMainFragment.FAIL -> handleGetFail()
+        }
+
+        return@Handler true
+    }
+
+    private fun handleGetSuccess(order : String) {
+        if (dialog != null && dialog!!.isShowing) {
+            if(order == "start") {
+                Timer().schedule(object : TimerTask() {
+                    override fun run() {
+                        activity!!.runOnUiThread {
+                            startTimer()
+                            timerState = TimerState.Running
+                            updateButtons()
+                        }
+                    }
+                }, 200)
+            } else if(order == "stop"){
+                Timer().schedule(object : TimerTask() {
+                    override fun run() {
+                        activity!!.runOnUiThread {
+                            timer.cancel()
+                            onTimerFinished()
+                        }
+                    }
+                }, 200)
+            }
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(TabMainFragment.MOVE), 300)
+        }else {
+            mHandler.sendMessage(mHandler.obtainMessage(TabMainFragment.MOVE))
+        }
+
+    }
+
+    private fun handleGetFail() {
+        Toast.makeText(context, "Fail to load", Toast.LENGTH_SHORT).show()
+        if (dialog != null && dialog!!.isShowing) {
+            mHandler.sendMessage(mHandler.obtainMessage(TabMainFragment.MOVE))
+        }
+    }
+
+    private fun requestAttendance(order : String) {
+        dialog = ProgressDialog(context!!)
+        dialog!!.setCanceledOnTouchOutside(false)
+        dialog!!.setCancelable(false)
+
+        var query : String = order
+        var resource = "/cnt-ps-key"
+
+        var resultCode : Int = 400
+        HttpRequestService.getObject().httpRequestWithHandler(context!!, "POST",
+                resource, query , 4,
+                object : HttpResponseEventRouter {
+                    override fun route(context: Context, code: Int, arg: String) {
+                        activity!!.runOnUiThread {
+                            resultCode = code
+                            if(code == 201 || code == 202) {
+                                if(order == "start")
+                                    mHandler.sendMessageDelayed(mHandler.obtainMessage(TabMainFragment.SUCCESS_START), 300)
+                                else if(order == "stop")
+                                    mHandler.sendMessageDelayed(mHandler.obtainMessage(TabMainFragment.SUCCESS_STOP), 300)
+                            }
+                            else
+                                mHandler.sendMessageDelayed(mHandler.obtainMessage(TabMainFragment.FAIL), 300)
+                        }
+                    }
+                })
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                activity!!.runOnUiThread {
+                    dialog!!.show()
+                }
+            }
+        }, 200)
+    }
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -80,13 +170,10 @@ class TabMainFragment : Fragment() {
         this.btn_setting = view.findViewById(R.id.fab_setting)
 
         btn_start.setOnClickListener {v->
-            startTimer()
-            timerState = TimerState.Running
-            updateButtons()
+            requestAttendance("start")
         }
         btn_stop.setOnClickListener { v ->
-            timer.cancel()
-            onTimerFinished()
+            requestAttendance("stop")
         }
         btn_setting.setOnClickListener { v ->
            startSnackbar(v)
@@ -185,7 +272,7 @@ class TabMainFragment : Fragment() {
             override fun onFinish() {
                 //if the activity is counting and finished
                 Toast.makeText(context, "Timeout by Activity", Toast.LENGTH_SHORT).show()
-                onTimerFinished()
+                requestAttendance("stop")
             }
 
             override fun onTick(millisUntilFinished: Long) {

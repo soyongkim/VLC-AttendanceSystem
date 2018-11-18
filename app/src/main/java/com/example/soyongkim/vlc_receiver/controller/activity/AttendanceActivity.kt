@@ -2,8 +2,10 @@ package com.example.soyongkim.vlc_receiver.controller.activity
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import com.example.soyongkim.vlc_receiver.R
 import android.os.Bundle
+import android.os.Handler
 import android.support.constraint.ConstraintLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.CardView
@@ -16,11 +18,17 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import cn.pedant.sweetalert.SweetAlertDialog
+import com.example.soyongkim.vlc_receiver.controller.util.HttpResponseEventRouter
 import com.example.soyongkim.vlc_receiver.model.item.AttendanceUser
 import com.example.soyongkim.vlc_receiver.model.item.UsbSingleton
+import com.example.soyongkim.vlc_receiver.model.service.HttpRequestService
+import com.example.soyongkim.vlc_receiver.view.LoginDialog
+import com.example.soyongkim.vlc_receiver.view.ProgressDialog
 import com.hoho.android.usbserial.driver.UsbSerialPort
-import java.util.ArrayList
-private var sPort: UsbSerialPort? = null
+import java.util.*
+
+private var dialog : LoginDialog? = null
 
 class AttendanceActivity : AppCompatActivity() {
 
@@ -45,17 +53,10 @@ class AttendanceActivity : AppCompatActivity() {
         this.adapter.addItem(AttendanceUser("Student",  2))
         this.adapter.notifyDataSetChanged()
 
-        try {
-            sPort = UsbSingleton.getUsbPort()
-            Toast.makeText(this, "Check: " + sPort?.driver?.device?.deviceName, Toast.LENGTH_SHORT).show()
-        } catch (e:Exception) {
-            Toast.makeText(this, "Error:$e", Toast.LENGTH_LONG).show()
-        }
-
 
     }
 
-    private fun showAdminAcitivty() {
+    private fun showAdminActivity() {
         try {
             val intent = Intent(this@AttendanceActivity, AttendanceAdminActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -66,10 +67,15 @@ class AttendanceActivity : AppCompatActivity() {
         }
     }
 
-    private fun showStudentAcitivty() {
-        val intent = Intent(this@AttendanceActivity, AttendanceStudentActivity::class.java)
-        this.startActivity(intent)
-        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    private fun showStudentActivity() {
+        dialog = LoginDialog(this@AttendanceActivity)
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                this@AttendanceActivity.runOnUiThread {
+                    dialog!!.show()
+                }
+            }
+        }, 200)
     }
 
 
@@ -100,10 +106,11 @@ class AttendanceActivity : AppCompatActivity() {
             holder.constraint.setOnClickListener {
                 when (mItems[position].Name) {
                     "Manager" -> {
-                        context.showAdminAcitivty()
+                        context.showAdminActivity()
                     }
                     "Student" -> {
-                        context.showStudentAcitivty()
+
+                        context.showStudentActivity()
                     }
                 }
             }
@@ -133,15 +140,6 @@ class AttendanceActivity : AppCompatActivity() {
             var textView: TextView = view.findViewById(R.id.content_name)
             var constraint: ConstraintLayout = view.findViewById(R.id.constraint)
             var cardView: CardView = view.findViewById(R.id.card_view)
-        }
-    }
-
-    companion object {
-        fun show(context: Context, port: UsbSerialPort?) {
-            sPort = port
-            val intent = Intent(context, AttendanceActivity::class.java)
-            //intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT and Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            context.startActivity(intent)
         }
     }
 }
