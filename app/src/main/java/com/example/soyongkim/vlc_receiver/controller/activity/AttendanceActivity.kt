@@ -109,7 +109,6 @@ class AttendanceActivity : AppCompatActivity() {
                         context.showAdminActivity()
                     }
                     "Student" -> {
-
                         context.showStudentActivity()
                     }
                 }

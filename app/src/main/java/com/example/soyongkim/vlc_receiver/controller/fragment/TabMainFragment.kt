@@ -30,7 +30,6 @@ import com.example.soyongkim.vlc_receiver.view.ProgressDialog
 
 
 class TabMainFragment : Fragment() {
-
     companion object {
         fun setAlarm(context: Context, nowSeconds: Long, secondsRemaining: Long): Long{
             val wakeUpTime = (nowSeconds + secondsRemaining) * 1000
@@ -119,13 +118,13 @@ class TabMainFragment : Fragment() {
     }
 
     private fun handleGetFail() {
-        Toast.makeText(context, "Fail to load", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Fail to load the student list", Toast.LENGTH_SHORT).show()
         if (dialog != null && dialog!!.isShowing) {
             mHandler.sendMessage(mHandler.obtainMessage(TabMainFragment.MOVE))
         }
     }
 
-    private fun requestAttendance(order : String) {
+    fun requestAttendance(order : String) {
         dialog = ProgressDialog(context!!)
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
@@ -133,13 +132,11 @@ class TabMainFragment : Fragment() {
         var query : String = order
         var resource = "/cnt-ps-key"
 
-        var resultCode : Int = 400
         HttpRequestService.getObject().httpRequestWithHandler(context!!, "POST",
                 resource, query , 4,
                 object : HttpResponseEventRouter {
                     override fun route(context: Context, code: Int, arg: String) {
                         activity!!.runOnUiThread {
-                            resultCode = code
                             if(code == 201 || code == 202) {
                                 if(order == "start")
                                     mHandler.sendMessageDelayed(mHandler.obtainMessage(TabMainFragment.SUCCESS_START), 300)
@@ -178,6 +175,7 @@ class TabMainFragment : Fragment() {
         btn_setting.setOnClickListener { v ->
            startSnackbar(v)
         }
+
         return view
     }
 
@@ -271,7 +269,7 @@ class TabMainFragment : Fragment() {
         timer = object : CountDownTimer(secondsRemaining * 1000, 1000) {
             override fun onFinish() {
                 //if the activity is counting and finished
-                Toast.makeText(context, "Timeout by Activity", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Stop", Toast.LENGTH_SHORT).show()
                 requestAttendance("stop")
             }
 

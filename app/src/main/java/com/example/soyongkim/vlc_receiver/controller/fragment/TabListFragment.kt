@@ -67,7 +67,7 @@ class TabListFragment : Fragment() {
         }
     }
 
-    private fun loadingDialog() {
+    private fun loadingList() {
         dialog = ProgressDialog(context!!)
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
@@ -146,7 +146,7 @@ class TabListFragment : Fragment() {
         this.recyclerView.adapter = this.adapter
         this.recyclerView.layoutManager = this.layoutManager
 
-        loadingDialog()
+        loadingList()
 
         return view
     }

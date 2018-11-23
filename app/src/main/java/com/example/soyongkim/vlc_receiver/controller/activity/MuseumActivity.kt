@@ -14,7 +14,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +26,9 @@ import com.example.soyongkim.vlc_receiver.controller.util.*
 import com.example.soyongkim.vlc_receiver.R
 import com.example.soyongkim.vlc_receiver.model.item.Content
 import com.example.soyongkim.vlc_receiver.model.item.UsbSingleton
+import com.example.soyongkim.vlc_receiver.model.service.HttpRequestService
 import com.example.soyongkim.vlc_receiver.view.CustomVideoView
+import com.example.soyongkim.vlc_receiver.view.ProgressDialog
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.util.*
 import kotlinx.android.synthetic.main.activity_mode_museum.*
@@ -38,7 +39,11 @@ import java.util.concurrent.Executors
 private var sPort: UsbSerialPort? = null
 
 class MuseumActivity : AppCompatActivity() {
-
+    companion object {
+        const val MOVE = 0
+        const val SUCCESS = 1
+        const val FAIL = 2
+    }
     private lateinit var recyclerView: RecyclerView
     private var mAdapter: ContentListAdapter = ContentListAdapter(this)
     private var layoutManager = LinearLayoutManager(this)
@@ -53,13 +58,43 @@ class MuseumActivity : AppCompatActivity() {
 
     internal var rcvdId = 1
     internal var rcvdType = 0
-    internal var pastId = 0
+    internal var pastId = 3
 
     private val mExecutor = Executors.newCachedThreadPool()
     private var mSerialIoManager: SerialInputOutputManager? = null
 
     lateinit var videoTimer: Timer
     var task: TimerTask? = null
+
+    private var dialog: ProgressDialog? = null
+
+    private var mHandler = Handler() {
+        when (it.what) {
+            MuseumActivity.MOVE -> {
+                if(dialog != null) {
+                    dialog!!.dismiss()
+                    dialog = null
+                }
+            }
+            MuseumActivity.SUCCESS -> handleSuccess()
+            MuseumActivity.FAIL -> handleFail()
+        }
+
+        return@Handler true
+    }
+
+    private fun handleSuccess() {
+        if (dialog != null && dialog!!.isShowing) {
+            mHandler.sendMessage(mHandler.obtainMessage(MuseumActivity.MOVE))
+        }
+    }
+
+    private fun handleFail() {
+        if (dialog != null && dialog!!.isShowing) {
+            Toast.makeText(this, "Fail to request Type Message", Toast.LENGTH_SHORT).show()
+            mHandler.sendMessage(mHandler.obtainMessage(MuseumActivity.MOVE))
+        }
+    }
 
     private val mListener = object : SerialInputOutputManager.Listener {
         override fun onRunError(e: Exception) {}
@@ -71,12 +106,11 @@ class MuseumActivity : AppCompatActivity() {
                     videoTimer.purge()
                 }
                 try {
-                    rcvdId = TypeChangeUtil.byte2intId(data)
-                    rcvdType = TypeChangeUtil.byte2intType(data)
+                    rcvdId = TypeChangeUtil.byteToIntId(data)
+                    rcvdType = TypeChangeUtil.byteToIntType(data)
 
                     //For Debugging the VLC data
                     //Toast.makeText(this@MuseumActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show();
-
                     processVLCdata()
 
                     task = CountVideoTask()
@@ -124,7 +158,7 @@ class MuseumActivity : AppCompatActivity() {
                 if (mPlayer != null)
                     mPlayer!!.start()
             } catch (e: Exception) {
-                Toast.makeText(getApplicationContext(), "ProcessError:$e", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(getApplicationContext(), "ProcessError:$e", Toast.LENGTH_SHORT).show()
             }
             else -> Toast.makeText(this, "Not Processing", Toast.LENGTH_SHORT).show()
         }
@@ -178,7 +212,12 @@ class MuseumActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mode_museum);
 
-        sPort = UsbSingleton.getUsbPort()
+        try {
+            sPort = UsbSingleton.getUsbPort()
+        } catch (e:Exception) {
+            Toast.makeText(this, "Error:$e", Toast.LENGTH_LONG).show()
+            finish()
+        }
 
         findViewById<ImageView>(R.id.activity_icon).setImageResource(R.mipmap.icon_museum2)
 
@@ -249,7 +288,34 @@ class MuseumActivity : AppCompatActivity() {
         onDeviceStateChange()
     }
 
-    public fun startInitAnimation() {
+    fun sendMessage(reqType : String) {
+        dialog = ProgressDialog(this@MuseumActivity)
+        dialog!!.setCanceledOnTouchOutside(false)
+        dialog!!.setCancelable(false)
+        HttpRequestService.getObject().httpRequestWithHandler(this@MuseumActivity, "POST",
+                "/cnt-museum", reqType, 4,
+                object : HttpResponseEventRouter {
+                    override fun route(context: Context, code: Int, arg: String) {
+                        runOnUiThread {
+                            if (code == 201) {
+                                mHandler.sendMessageDelayed(mHandler.obtainMessage(MuseumActivity.SUCCESS), 1000)
+                            } else {
+                                mHandler.sendMessageDelayed(mHandler.obtainMessage(MuseumActivity.FAIL), 1000)
+                            }
+                        }
+                    }
+                })
+
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                    dialog!!.show()
+                }
+            }
+        }, 200)
+    }
+
+    fun startInitAnimation() {
         startMyAnimation(R.id.illust_phone)
         Handler().postDelayed(Runnable {
             startMyAnimation(R.id.illust_light)
@@ -291,7 +357,7 @@ class MuseumActivity : AppCompatActivity() {
                     if (mPlayer != null)
                         mPlayer!!.pause()
                 } catch (e: Exception) {
-                    Toast.makeText(applicationContext, "Time out!", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(applicationContext, "Time out!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -327,12 +393,15 @@ private class ContentListAdapter : RecyclerView.Adapter<ContentListAdapter.ViewH
                     context.contents_video.visibility = View.INVISIBLE
                     context.contents_init.visibility = View.VISIBLE
                     context.startInitAnimation()
+                    context.sendMessage("image")
+
                 }
                 "Video" -> {
                     context.contents_desc.visibility = View.INVISIBLE
                     context.contents_video.visibility = View.INVISIBLE
                     context.contents_init.visibility = View.VISIBLE
                     context.startInitAnimation()
+                    context.sendMessage("video")
                 }
             }
         }

@@ -10,6 +10,7 @@ import android.widget.TextView
 
 import com.example.soyongkim.vlc_receiver.R
 import com.example.soyongkim.vlc_receiver.controller.component.adapter.PagerAdapter
+import com.example.soyongkim.vlc_receiver.controller.fragment.TabMainFragment
 import com.example.soyongkim.vlc_receiver.view.CustomViewPager
 
 class AttendanceAdminActivity : AppCompatActivity() {
@@ -24,7 +25,7 @@ class AttendanceAdminActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mode_admin);
         findViewById<ImageView>(R.id.activity_icon).setImageResource(R.mipmap.icon_manager)
-        findViewById<TextView>(R.id.app_title).setText("Manager")
+        findViewById<TextView>(R.id.app_title).text = "Manager"
 
         tabLayout = findViewById(R.id.tab_layout)
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_timer))
@@ -53,6 +54,13 @@ class AttendanceAdminActivity : AppCompatActivity() {
 
             }
         })
+    }
+
+    fun requestStop() {
+        var fragment = this.adapter.getItem(0)
+        if(fragment is TabMainFragment) {
+            (fragment as TabMainFragment).requestAttendance("stop")
+        }
     }
 
     override fun onDestroy() {

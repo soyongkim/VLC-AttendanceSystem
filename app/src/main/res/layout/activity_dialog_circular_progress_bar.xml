@@ -7,13 +7,13 @@
 
     <FrameLayout
         android:id="@+id/circular_progress_bar"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal">
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="5dp">
 
         <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:indeterminateTint="@color/colorProgress" />
     </FrameLayout>
 
@@ -25,17 +25,12 @@
         android:visibility="gone">
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/success_bow"/>
-
-        <View
             android:id="@+id/mask_right"
             android:layout_width="35dp"
             android:layout_height="80dp"
             android:layout_marginTop="-13dp"
             android:layout_gravity="right"
-            android:background="@android:color/white"/>
+            android:background="@android:color/transparent"/>
 
         <View
             android:id="@+id/mask_left"
@@ -43,12 +38,7 @@
             android:layout_height="60dp"
             android:layout_marginLeft="-3dp"
             android:layout_gravity="left"
-            android:background="@android:color/white"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/success_circle"/>
+            android:background="@android:color/transparent"/>
 
         <cn.pedant.sweetalert.SuccessTickView
             android:id="@+id/success_tick"

@@ -6,6 +6,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.example.soyongkim.vlc_receiver.controller.fragment.TabMainFragment
+import com.example.soyongkim.vlc_receiver.controller.util.NotificationUtil
+import com.example.soyongkim.vlc_receiver.controller.util.PrefUtil
 import com.example.soyongkim.vlc_receiver.model.item.UsbSingleton
 import com.hoho.android.usbserial.driver.UsbSerialPort
 
@@ -17,7 +20,14 @@ class SelectModeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_mode)
+    }
 
+    override fun onResume() {
+        super.onResume()
+        // TImer stop on TimerNotification
+        TabMainFragment.removeAlarm(this)
+        PrefUtil.setTimerState(TabMainFragment.TimerState.Stopped, this)
+        NotificationUtil.hideTimerNotification(this)
     }
 
     fun onClick(view: View) {

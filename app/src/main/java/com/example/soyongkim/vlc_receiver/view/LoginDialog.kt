@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.example.soyongkim.vlc_receiver.R
 import com.example.soyongkim.vlc_receiver.controller.activity.AttendanceStudentActivity
 import com.example.soyongkim.vlc_receiver.controller.activity.InitActivity
+import com.example.soyongkim.vlc_receiver.controller.activity.SelectModeActivity
 import com.example.soyongkim.vlc_receiver.controller.fragment.TabListFragment
 import com.example.soyongkim.vlc_receiver.controller.util.HttpResponseEventRouter
 import com.example.soyongkim.vlc_receiver.model.service.HttpRequestService
@@ -37,6 +38,16 @@ class LoginDialog(context : Context?) : Dialog(context) {
                     dialog!!.dismiss()
                     dialog = null
                     this.dismiss()
+                    Timer().schedule(object : TimerTask(){
+                        override fun run() {
+                            this@LoginDialog.run {
+                                val intent = Intent(context, AttendanceStudentActivity::class.java)
+                                intent.putExtra("sid", editId.text.toString())
+                                intent.putExtra("tmp", editPwd.text.toString())
+                                context!!.startActivity(intent)
+                            }
+                        }
+                    } , 200)
                 }
             }
             InitActivity.GET_SUCCESS -> handleSuccess()
@@ -48,21 +59,19 @@ class LoginDialog(context : Context?) : Dialog(context) {
 
     private fun handleSuccess() {
         if (dialog != null && dialog!!.isShowing) {
-            val intent = Intent(context, AttendanceStudentActivity::class.java)
-            //Toast.makeText(context, "edit:${editId.text}", Toast.LENGTH_SHORT).show()
-            intent.putExtra("sid", editId.text.toString())
-            intent.putExtra("tmp", editPwd.text.toString())
-            context.startActivity(intent)
+            dialog!!.changeAlertType(ProgressDialog.SUCCESS_TYPE)
         }
 
-        mHandler.sendMessage(mHandler.obtainMessage(InitActivity.MOVE))
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.MOVE), 2000)
 
     }
 
     private fun handleFail() {
-        Toast.makeText(context, "The ID or password error", Toast.LENGTH_SHORT).show()
         if (dialog != null && dialog!!.isShowing) {
-            mHandler.sendMessage(mHandler.obtainMessage(InitActivity.MOVE))
+            Toast.makeText(context, "The ID or password error", Toast.LENGTH_SHORT).show()
+            dialog!!.dismiss()
+            dialog = null
+            this.dismiss()
         }
     }
 
@@ -78,7 +87,7 @@ class LoginDialog(context : Context?) : Dialog(context) {
             var password = editPwd.text
             dialog = ProgressDialog(context)
             HttpRequestService.getObject().httpRequestWithHandler(context, "GET",
-                    "/std_" + id,
+                    "/std_$id",
                     object : HttpResponseEventRouter {
                         override fun route(context: Context, code: Int, arg: String) {
                             Log.d("code", "code:${code} arg:${arg}")

@@ -39,7 +39,7 @@ class InitActivity : AppCompatActivity() {
                 Timer().schedule(object : TimerTask(){
                     override fun run() {
                         this@InitActivity.run {
-                            val intent = Intent(this, SelectModeActivity::class.java)
+                            val intent = Intent(this, DeviceListActivity::class.java)
                             startActivity(intent)
                             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                         }
