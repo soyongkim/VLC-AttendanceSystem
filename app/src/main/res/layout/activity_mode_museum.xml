@@ -69,6 +69,7 @@
 
             <ImageView
                 android:id="@+id/contents_desc"
+                android:scaleType="fitXY"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="invisible" />

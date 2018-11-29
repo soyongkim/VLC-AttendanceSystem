@@ -20,8 +20,8 @@ public class TypeChangeUtil {
     }
 
     public static byte[] byteToStringData(byte[] src) {
-        byte[] data = new byte[10];
-        for(int i=4; src[i] != 0; i++) {
+        byte[] data = new byte[16];
+        for(int i=4; i<20; i++) {
             data[i-4] = src[i];
         }
         //String value = new String(data, Charset.forName("UTF-8"));

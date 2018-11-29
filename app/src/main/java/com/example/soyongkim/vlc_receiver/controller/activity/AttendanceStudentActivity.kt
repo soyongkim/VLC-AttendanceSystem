@@ -1,8 +1,6 @@
 package com.example.soyongkim.vlc_receiver.controller.activity
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import android.os.Bundle
@@ -19,7 +17,6 @@ import android.os.Handler
 import android.util.Log
 import android.util.Xml
 import android.widget.Toast
-import com.example.soyongkim.vlc_receiver.controller.fragment.TabListFragment
 import com.example.soyongkim.vlc_receiver.controller.util.HttpResponseEventRouter
 import com.example.soyongkim.vlc_receiver.controller.util.TypeChangeUtil
 import com.example.soyongkim.vlc_receiver.model.item.UsbSingleton
@@ -68,6 +65,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
                         rcvdId = TypeChangeUtil.byteToIntId(data)
                         rcvdType = TypeChangeUtil.byteToIntType(data)
                         rcvdData = TypeChangeUtil.byteToStringData(data)
+                        //updateReceivedData(data)
                         //Toast.makeText(this@AttendanceStudentActivity, HexDump.toHexString(rcvdData), Toast.LENGTH_LONG).show()
                         //For Debugging the VLC data
                         //Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()

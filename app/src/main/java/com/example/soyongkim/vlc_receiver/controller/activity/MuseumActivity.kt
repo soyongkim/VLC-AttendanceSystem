@@ -111,6 +111,9 @@ class MuseumActivity : AppCompatActivity() {
 
                     //For Debugging the VLC data
                     //Toast.makeText(this@MuseumActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show();
+
+                    //updateReceivedData(data)
+
                     processVLCdata()
 
                     task = CountVideoTask()
@@ -162,6 +165,11 @@ class MuseumActivity : AppCompatActivity() {
             }
             else -> Toast.makeText(this, "Not Processing", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun updateReceivedData(data: ByteArray) {
+        val message = "Read : " + data.size + " bytes :\n" + HexDump.toHexString(data) + "\n"
+        Toast.makeText(applicationContext, "Data:$message", Toast.LENGTH_LONG).show()
     }
 
     private fun updateImage(id: Int) {
