@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8"/>
+        <title>VR Description</title>
+        <style>
+            html {
+                height : 100%;
+            }
+            body {
+                background-color: black;
+                height : 100%;
+            }
+            .imagediv {
+                height : 100%;
+            }
+            
+            img {
+                height : 90%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h3><span style="color:white">VR-Description</span></h3>
+        
+        <div class = 'imagediv'>
+            <!-- <img src='images/cow.jpg'> -->
+        </div>
+         
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+        $(function(){
+          // socket.io 서버에 접속한다
+          var socket = io();
+    
+          // 서버로부터의 메시지가 수신되면
+          socket.on("desp", function(data) {
+            $(".imagediv").empty();
+            $(".imagediv").append('<img src="' + data + '" />');
+          });
+        });
+        </script>
+    </body>
+</html>

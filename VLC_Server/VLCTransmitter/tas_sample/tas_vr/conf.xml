@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<m2m:conf xmlns:m2m="http://www.onem2m.org/xml/protocols" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <tas>
+        <comport>/dev/ttyUSB0</comport>
+        <baudrate>115200</baudrate>
+        <parenthostname>localhost</parenthostname>
+        <parentport>3105</parentport>
+    </tas>
+    <download>
+        <ctname>CNT-VR-DATA</ctname>
+        <id>VR-DATA</id>
+    </download>
+    <upload>
+        <ctname>CNT-VR-DESP</ctname>
+        <id>VR-DESP</id>
+    </upload>
+</m2m:conf>

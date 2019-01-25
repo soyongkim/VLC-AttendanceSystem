@@ -1,0 +1,52 @@
+{
+    "/Rosemary/AE-VIIP-GW/CNT-GW-HEARTBEAT": {
+        "cni": 1,
+        "cbs": 94,
+        "st": 1
+    },
+    "/Rosemary/CNT-GW-DATA": {
+        "cni": 2,
+        "cbs": 188,
+        "st": 2
+    },
+    "/Rosemary/AE-VIIP-GW/CNT-GW-DATA": {
+        "cni": 1,
+        "cbs": 23,
+        "st": 1
+    },
+    "/GW-1F-101/AE-VIIP-GW/CNT-GW-DATA": {
+        "cni": 423,
+        "cbs": 31725,
+        "st": 423
+    },
+    "/GW-1F-101/VR1/CNT-VR-DESP": {
+        "cni": 6,
+        "cbs": 6,
+        "st": 6
+    },
+    "/GW-1F-101/VT1/CNT-VLC-CONTROL": {
+        "cni": 3,
+        "cbs": 42,
+        "st": 3
+    },
+    "/GW-1F-101/CNT-GW-HEARTBEAT": {
+        "cni": 4,
+        "cbs": 60,
+        "st": 4
+    },
+    "/GW-1F-101/VT1/CNT-VT-HEARTBEAT": {
+        "cni": 445,
+        "cbs": 12473,
+        "st": 445
+    },
+    "/GW-1F-101/AE-VIIP-GW/CNT-GW-CONTROL": {
+        "cni": 4,
+        "cbs": 8,
+        "st": 4
+    },
+    "/GW-1F-101/VT1/CNT-VLC-DATA": {
+        "cni": 445,
+        "cbs": 40418,
+        "st": 445
+    }
+}

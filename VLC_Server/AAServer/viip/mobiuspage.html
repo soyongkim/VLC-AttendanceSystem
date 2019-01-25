@@ -1,0 +1,308 @@
+<!-- <html>
+<head>
+  <meta charset="utf-8">
+  <title>Socket.io Chat Example</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+    <h3>Socket.io Chat Example</h3>
+    <form class="form-inline">
+      <div class="form-group">
+        <label for="msgForm">Message: </label>
+        <input type="text" class="form-control" id="msgForm">
+      </div>
+      <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+    <div id="chatLogs"></div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+  $(function(){
+    // socket.io 서버에 접속한다
+    var socket = io();
+
+    // 서버로 자신의 정보를 전송한다.
+    socket.emit("login", {
+      // name: "ungmo2",
+      name: makeRandomName(),
+      userid: "ungmo2@gmail.com"
+    });
+
+    // 서버로부터의 메시지가 수신되면
+    socket.on("login", function(data) {
+      $("#chatLogs").append("<div><strong>" + data + "</strong> has joined</div>");
+    });
+
+    // 서버로부터의 메시지가 수신되면
+    socket.on("chat", function(data) {
+      $("#chatLogs").append("<div>" + data.msg + " : from <strong>" + data.from.name + "</strong></div>");
+    });
+
+    // socket.on("check", function (data) {
+    //     $("#chatLogs").append("<div>" + data.check + "</div>");
+    // });
+
+    // Send 버튼이 클릭되면
+    $("form").submit(function(e) {
+      e.preventDefault();
+      var $msgForm = $("#msgForm");
+
+      // 서버로 메시지를 전송한다.
+      socket.emit("chat", { msg: $msgForm.val() });
+      $msgForm.val("");
+    });
+
+    function makeRandomName(){
+      var name = "";
+      var possible = "abcdefghijklmnopqrstuvwxyz";
+      for( var i = 0; i < 3; i++ ) {
+        name += possible.charAt(Math.floor(Math.random() * possible.length));
+      }
+      return name;
+    }
+  });
+  </script>
+</body>
+</html> -->
+
+
+
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8"/>
+        <title>Platform Server</title>
+        <meta
+            name="viewport"
+            content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+        <style type="text/css">
+            @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100);
+
+            body {
+                background-color: #3e94ec;
+                font-family: "Roboto", helvetica, arial, sans-serif;
+                font-size: 16px;
+                font-weight: 400;
+                text-rendering: optimizeLegibility;
+            }
+
+            div.table-title {
+                display: block;
+                margin: auto;
+                max-width: 600px;
+                padding: 5px;
+                width: 100%;
+            }
+
+            .table-title h3 {
+                color: #fafafa;
+                font-size: 30px;
+                font-weight: 400;
+                font-style: normal;
+                font-family: "Roboto", helvetica, arial, sans-serif;
+                text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+                text-transform: uppercase;
+            }
+
+            /*** Table Styles **/
+
+            .table-fill {
+                background: white;
+                border-radius: 3px;
+                border-collapse: collapse;
+                height: 320px;
+                margin: auto;
+                max-width: 600px;
+                padding: 5px;
+                width: 100%;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                animation: float 5s infinite;
+            }
+
+            th {
+                color: #D5DDE5;
+                background: #1b1e24;
+                border-bottom: 4px solid #9ea7af;
+                border-right: 1px solid #343a45;
+                font-size: 23px;
+                font-weight: 100;
+                padding: 24px;
+                text-align: left;
+                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+                vertical-align: middle;
+            }
+
+            th:first-child {
+                border-top-left-radius: 3px;
+            }
+
+            th:last-child {
+                border-top-right-radius: 3px;
+                border-right: none;
+            }
+
+            tr {
+                border-top: 1px solid #C1C3D1;
+                border-bottom: 1px solid #C1C3D1;
+                color: #666B85;
+                font-size: 16px;
+                font-weight: normal;
+                text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
+            }
+
+            tr:hover td {
+                background: #4E5066;
+                color: #FFFFFF;
+                border-top: 1px solid #22262e;
+            }
+
+            tr:first-child {
+                border-top: none;
+            }
+
+            tr:last-child {
+                border-bottom: none;
+            }
+
+            tr:nth-child(odd) td {
+                background: #EBEBEB;
+            }
+
+            tr:nth-child(odd):hover td {
+                background: #4E5066;
+            }
+
+            tr:last-child td:first-child {
+                border-bottom-left-radius: 3px;
+            }
+
+            tr:last-child td:last-child {
+                border-bottom-right-radius: 3px;
+            }
+
+            td {
+                background: #FFFFFF;
+                padding: 20px;
+                text-align: left;
+                vertical-align: middle;
+                font-weight: 300;
+                font-size: 18px;
+                text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+                border-right: 1px solid #C1C3D1;
+                text-align: center;
+            }
+
+            td:last-child {
+                border-right: 0;
+            }
+
+            th.text-left {
+                text-align: left;
+            }
+
+            th.text-center {
+                text-align: center;
+            }
+
+            th.text-right {
+                text-align: right;
+            }
+
+            td.text-left {
+                text-align: left;
+            }
+
+            td.text-center {
+                text-align: center;
+            }
+
+            td.text-right {
+                text-align: right;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="table-title">
+            <h3>PS-HEARTBEAT</h3>
+        </div>
+        <table class="table-fill">
+            <thead>
+                <tr>
+                    <th class="text-center">Gateway ID</th>
+                    <th class="text-center">VT ID</th>
+                    <th class="text-center">VR ID</th>
+                    <th class="text-center">VT state</th>
+                </tr>
+            </thead>
+            <tbody class="table-hover" id="vt1"></tbody>
+            <tbody class="table-hover" id="vt2"></tbody>
+            <tbody class="table-hover" id="vt3"></tbody>
+            <tbody class="table-hover" id="vt4"></tbody>
+            <tbody class="table-hover" id="vt5"></tbody>
+            <tbody class="table-hover" id="vt6"></tbody>
+        </table>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+        $(function(){
+          // socket.io 서버에 접속한다
+          var socket = io();
+
+          // 서버로부터의 메시지가 수신되면
+          socket.on("heartbeat", function(data) {
+            
+            if(data.vtid == '/VT1') {
+                $("#vt1").empty();
+                $("#vt1").append("<td>" + data.gwid + "</td>" + 
+                                     "<td>" + data.vtid + "</td>" + 
+                                     "<td>" + data.vrid + "</td>" + 
+                                     "<td>" + data.state + "</td>");
+            }
+            else if(data.vtid == '/VT2') {
+                $("#vt2").empty();
+                $("#vt2").append("<tr><td>" + data.gwid + "</td>" + 
+                                     "<td>" + data.vtid + "</td>" + 
+                                     "<td>" + data.vrid + "</td>" + 
+                                     "<td>" + data.state + "</td></tr>");
+            }
+            else if(data.vtid == '/VT3') {
+                $("#vt3").empty();
+                $("#vt3").append("<tr><td>" + data.gwid + "</td>" + 
+                                     "<td>" + data.vtid + "</td>" + 
+                                     "<td>" + data.vrid + "</td>" + 
+                                     "<td>" + data.state + "</td></tr>");
+            }
+            else if(data.vtid == '/VT4') {
+                $("#vt4").empty();
+                $("#vt4").append("<tr><td>" + data.gwid + "</td>" + 
+                                     "<td>" + data.vtid + "</td>" + 
+                                     "<td>" + data.vrid + "</td>" + 
+                                     "<td>" + data.state + "</td></tr>");
+            }
+            else if(data.vtid == '/VT5') {
+                $("#vt5").empty();
+                $("#vt5").append("<tr><td>" + data.gwid + "</td>" + 
+                                     "<td>" + data.vtid + "</td>" + 
+                                     "<td>" + data.vrid + "</td>" + 
+                                     "<td>" + data.state + "</td></tr>");
+            }
+            else if(data.vtid == '/VT6') {
+                $("#vt6").empty();
+                $("#vt6").append("</tr><td>" + data.gwid + "</td>" + 
+                                     "<td>" + data.vtid + "</td>" + 
+                                     "<td>" + data.vrid + "</td>" + 
+                                     "<td>" + data.state + "</td></tr>");
+            }
+            // $("#attribute").empty();
+            // $("#attribute").append("<tr><td class=\"text-left\">" + data.gwid + "</td>" + 
+            //                         "<td class=\"text-left\">" + data.vtid + "</td>" + 
+            //                         "<td class=\"text-left\">" + data.vrid + "</td>" + 
+            //                         "<td class=\"text-left\">" + data.state + "</td></tr>");
+          });
+        });
+        </script>
+    </body>
+</html>

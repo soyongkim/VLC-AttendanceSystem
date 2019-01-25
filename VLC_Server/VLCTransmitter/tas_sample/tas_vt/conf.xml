@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<m2m:conf xmlns:m2m="http://www.onem2m.org/xml/protocols" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <tas>
+        <parenthostname>localhost</parenthostname>
+        <parentport>3105</parentport>
+    </tas>
+    <download>
+        <ctname>CNT-VLC-CONTROL</ctname>
+        <id>VLC-CONTROL</id>
+    </download>
+    <download>
+        <ctname>CNT-VLC-DATA</ctname>
+        <id>VLC-DATA</id>
+    </download>
+    <upload>
+        <ctname>CNT-VT-HEARTBEAT</ctname>
+        <id>VT-HEARTBEAT</id>
+    </upload>
+</m2m:conf>

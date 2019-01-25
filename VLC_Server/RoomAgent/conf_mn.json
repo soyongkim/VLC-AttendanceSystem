@@ -1,0 +1,12 @@
+{
+    "parent" : {
+        "cbname": "Mobius",
+        "cbcseid": "/Mobius",
+        "cbhost": "155.230.34.228",
+        "cbhostport": "7579",
+        "cbprotocol": "http",
+        "mqttbroker": "127.0.0.1"
+    },
+    "csebaseport": "7599",
+    "dbpass": "16A!0bfTg7$0"
+}
