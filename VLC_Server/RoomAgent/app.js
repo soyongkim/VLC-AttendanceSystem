@@ -48,11 +48,11 @@ var sgn = require('./mobius/sgn');
 var db = require('./mobius/db_action');
 var db_sql = require('./mobius/sql_action');
 
-const viip_gw = require('./viip/gw_app');
+const viip_va = require('./viip/va_app');
 
 console.log = require('debug')('viip:test');
 console.error = require('debug')('viip:error');
-var debug = require('debug')('viip:gw');
+var debug = require('debug')('viip:va');
 
 // ������ �����մϴ�.
 var app = express();
@@ -595,7 +595,7 @@ else {
                     });
                 }
 
-                viip_gw.init();
+                viip_va.init();
             });
         }
     });
@@ -1818,7 +1818,7 @@ function lookup_create(request, response) {
                 return rsc;
             }
 
-            viip_gw.binding_cin(parent_comm, body_Obj, ty);
+            viip_va.process_request(parent_comm, body_Obj, ty);
 
             var rootnm = request.headers.rootnm;
 

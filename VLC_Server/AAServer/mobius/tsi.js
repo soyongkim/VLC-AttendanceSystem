@@ -14,51 +14,23 @@
  * @author Il Yeup Ahn [iyahn@keti.re.kr]
  */
 
-var fs = require('fs');
+var url = require('url');
+var xml2js = require('xml2js');
+var xmlbuilder = require('xmlbuilder');
+var util = require('util');
 
-var data  = fs.readFileSync('conf.json', 'utf-8');
-var conf = JSON.parse(data);
-
-global.defaultbodytype      = 'json';
-
-
-// my CSE information
-global.usecsetype           = 'in'; // select 'in' or 'mn' or asn'
-global.usecsebase           = 'AAServer';
-global.usecseid             = '/AAServer';
-global.usecsebaseport       = conf.csebaseport;
-
-global.usedbhost            = 'localhost';
-global.usedbpass            = conf.dbpass;
-
-global.usepxywsport         = '7577';
-global.usepxymqttport       = '7578';
+var responder = require('./responder');
 
 
-global.usetsagentport       = '7582';
+exports.build_tsi = function(request, response, resource_Obj, body_Obj, callback) {
+    var rootnm = request.headers.rootnm;
 
-global.usemqttbroker        = 'localhost'; // mqttbroker for mobius
+    // body
+    resource_Obj[rootnm].con = body_Obj[rootnm].con;
+    resource_Obj[rootnm].cs = Buffer.byteLength(resource_Obj[rootnm].con, 'utf8').toString();
 
-global.usesecure            = 'disable';
-if(usesecure === 'enable') {
-    global.usemqttport      = '8883';
-}
-else {
-    usemqttport             = '1883';
-}
+    resource_Obj[rootnm].dgt = (body_Obj[rootnm].dgt) ? body_Obj[rootnm].dgt : '';
+    resource_Obj[rootnm].sqn = (body_Obj[rootnm].sqn) ? body_Obj[rootnm].sqn : '';
 
-global.useaccesscontrolpolicy = 'disable';
-
-global.wdt = require('./wdt');
-
-
-global.allowed_ae_ids = [];
-//allowed_ae_ids.push('ryeubi');
-
-global.allowed_app_ids = [];
-//allowed_app_ids.push('APP01');
-
-global.usesemanticbroker    = '10.10.202.114';
-
-// CSE core
-require('./app');
+    callback('1', resource_Obj);
+};

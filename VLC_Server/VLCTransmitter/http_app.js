@@ -27,6 +27,7 @@ var cbor = require('cbor');
 global.sh_adn = require('./http_adn');
 var noti = require('./noti');
 var tas = require('./thyme_tas');
+var vt = require('./vt_module/vt');
 
 console.log = require('debug')('viip:debug');
 var debug = require('debug')(`viip:${mode}`);
@@ -41,7 +42,6 @@ var app = express();
 //app.use(bodyParser.json({ type: 'application/*+json' }));
 //app.use(bodyParser.text({ type: 'application/*+xml' }));
 
-// ?????? ????????.
 var server = null;
 var noti_topic = '';
 
@@ -260,7 +260,8 @@ function http_watchdog() {
                     // mqtt에 topic을 만들고 sub로 등록하고 대기
                     ready_for_notification();
 
-                    tas.ready();
+                    //tas.ready();
+                    vt.init();
 
                     // var _ae = {};
                     // _ae.id = conf.ae.id;
@@ -326,18 +327,17 @@ function mqtt_connect(serverip, noti_topic) {
                 rejectUnauthorized: false
             };
         }
-        console.log('[So]mqtt connect start');
+        console.log('[mqtt] MQTT connect start');
         mqtt_client = mqtt.connect(connectOptions);
     }
 
     mqtt_client.on('connect', function () {
-        console.log('[So]connect event occur');
         mqtt_client.subscribe(noti_topic);
         console.log('[mqtt_connect] noti_topic : ' + noti_topic);
     });
 
     mqtt_client.on('message', function (topic, message) {
-        debug('Catched MQTT Message!!!!!');
+        debug('>> Receive VA Message (MQTT)');
         var topic_arr = topic.split("/");
 
         var bodytype = conf.ae.bodytype;

@@ -10,55 +10,41 @@
 
 /**
  * @file
- * @copyright KETI Korea 2018, KETI
+ * @copyright KETI Korea 2018
  * @author Il Yeup Ahn [iyahn@keti.re.kr]
  */
 
-var fs = require('fs');
+var url = require('url');
+var xml2js = require('xml2js');
+var xmlbuilder = require('xmlbuilder');
+var util = require('util');
+var responder = require('./responder');
 
-var data  = fs.readFileSync('conf.json', 'utf-8');
-var conf = JSON.parse(data);
+var op = {
+    post: '1',
+    get: '2',
+    put: '3',
+    delete: '4',
+    notify: '5'
+};
 
-global.defaultbodytype      = 'json';
+exports.build_req = function(request, response, resource_Obj, body_Obj, callback) {
+    var rootnm = request.headers.rootnm;
 
+    // body
+    resource_Obj[rootnm].pi = '/' + usecsebase;
+    resource_Obj[rootnm].ri = '/' + usecsebase + '/' + resource_Obj[rootnm].rn;
 
-// my CSE information
-global.usecsetype           = 'in'; // select 'in' or 'mn' or asn'
-global.usecsebase           = 'AAServer';
-global.usecseid             = '/AAServer';
-global.usecsebaseport       = conf.csebaseport;
+    resource_Obj[rootnm].op = (body_Obj[rootnm].op) ? body_Obj[rootnm].op : op[request.method];
+    //resource_Obj[rootnm].tg = (body_Obj[rootnm].tg) ? body_Obj[rootnm].tg : resource_Obj[rootnm].ri;
+    resource_Obj[rootnm].tg = (body_Obj[rootnm].tg) ? body_Obj[rootnm].tg : url.parse(request.url).pathname;
+    resource_Obj[rootnm].org = (body_Obj[rootnm].org) ? body_Obj[rootnm].org : request.headers['x-m2m-origin'];
+    resource_Obj[rootnm].rid = (body_Obj[rootnm].rid) ? body_Obj[rootnm].rid : request.headers['x-m2m-ri'];
+    resource_Obj[rootnm].mi = (body_Obj[rootnm].mi) ? body_Obj[rootnm].mi : '';
+    resource_Obj[rootnm].pc = (body_Obj[rootnm].pc) ? body_Obj[rootnm].pc : '';
+    resource_Obj[rootnm].rs = (body_Obj[rootnm].rs) ? body_Obj[rootnm].rs : '';
+    resource_Obj[rootnm].ors = (body_Obj[rootnm].ors) ? body_Obj[rootnm].ors : '';
 
-global.usedbhost            = 'localhost';
-global.usedbpass            = conf.dbpass;
+    callback('1', resource_Obj);
+};
 
-global.usepxywsport         = '7577';
-global.usepxymqttport       = '7578';
-
-
-global.usetsagentport       = '7582';
-
-global.usemqttbroker        = 'localhost'; // mqttbroker for mobius
-
-global.usesecure            = 'disable';
-if(usesecure === 'enable') {
-    global.usemqttport      = '8883';
-}
-else {
-    usemqttport             = '1883';
-}
-
-global.useaccesscontrolpolicy = 'disable';
-
-global.wdt = require('./wdt');
-
-
-global.allowed_ae_ids = [];
-//allowed_ae_ids.push('ryeubi');
-
-global.allowed_app_ids = [];
-//allowed_app_ids.push('APP01');
-
-global.usesemanticbroker    = '10.10.202.114';
-
-// CSE core
-require('./app');

@@ -28,20 +28,20 @@ conf.useprotocol = 'http'; // select one for 'http' or 'mqtt' or 'coap' or 'ws'
 
 // build cse
 cse.host        = '192.168.228.1';
-cse.port        = '7579';
-cse.name        = 'Mobius';
-cse.id          = '/Mobius';
+cse.port        = '7599';
+cse.name        = 'RoomAgent';
+cse.id          = '/RoomAgent';
 cse.mqttport    = '1883';
 cse.wsport      = '7577';
 
 // build ae
 if(mode === 'vt') {
-  ae.name         = 'vt1';
-  ae.appid        = 'vt';
+  ae.name         = 'VT1';
+  ae.appid        = 'VLCTransmitter';
 }
 else {
-  ae.name         = 'vr1';
-  ae.appid        = 'vr';
+  ae.name         = 'VR1';
+  ae.appid        = 'VR';
 }
 ae.id           = 'S' + ae.name;
 ae.parent       = '/' + cse.name;
@@ -54,13 +54,13 @@ if(mode === 'vt') {
   // build cnt
   cnt_arr[count] = {};
   cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
-  cnt_arr[count++].name = 'cnt-vlcFrame';
+  cnt_arr[count++].name = 'cnt-IS-Message';
 
   // build sub
   count = 0;
   sub_arr[count] = {};
   sub_arr[count].parent = '/' + cse.name + '/' + ae.name + '/' + cnt_arr[count].name;
-  sub_arr[count].name = 'sub-vlcFrame';
+  sub_arr[count].name = 'sub-IS-Message';
   sub_arr[count++].nu = 'mqtt://' + cse.host + '/' + ae.id + '?ct=json'; // mqtt
 }
 else {

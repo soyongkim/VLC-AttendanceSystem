@@ -14,51 +14,66 @@
  * @author Il Yeup Ahn [iyahn@keti.re.kr]
  */
 
-var fs = require('fs');
+var mysql = require('mysql');
 
-var data  = fs.readFileSync('conf.json', 'utf-8');
-var conf = JSON.parse(data);
+var mysql_pool = null;
 
-global.defaultbodytype      = 'json';
-
-
-// my CSE information
-global.usecsetype           = 'in'; // select 'in' or 'mn' or asn'
-global.usecsebase           = 'AAServer';
-global.usecseid             = '/AAServer';
-global.usecsebaseport       = conf.csebaseport;
-
-global.usedbhost            = 'localhost';
-global.usedbpass            = conf.dbpass;
-
-global.usepxywsport         = '7577';
-global.usepxymqttport       = '7578';
+//var _this = this;
 
 
-global.usetsagentport       = '7582';
+exports.connect = function (host, port, user, password, callback) {
+    mysql_pool = mysql.createPool({
+        host: host,
+        port: port,
+        user: user,
+        password: password,
+        database: 'mobiusdb',
+        connectionLimit: 100,
+        waitForConnections: true,
+        debug: false,
+        acquireTimeout: 50000,
+        queueLimit: 0
+    });
 
-global.usemqttbroker        = 'localhost'; // mqttbroker for mobius
+    callback('1');
+};
 
-global.usesecure            = 'disable';
-if(usesecure === 'enable') {
-    global.usemqttport      = '8883';
+
+function executeQuery(pool, query, callback) {
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            return callback(err, null);
+        }
+        else if (connection) {
+            connection.query({sql:query, timeout:60000}, function (err, rows, fields) {
+                connection.release();
+                if (err) {
+                    return callback(err, null);
+                }
+                return callback(null, rows);
+            })
+        }
+        else {
+            return callback(true, "No Connection");
+        }
+    });
 }
-else {
-    usemqttport             = '1883';
-}
-
-global.useaccesscontrolpolicy = 'disable';
-
-global.wdt = require('./wdt');
 
 
-global.allowed_ae_ids = [];
-//allowed_ae_ids.push('ryeubi');
+exports.getResult = function(query, db_Obj, callback) {
+    if(mysql_pool == null) {
+        console.error("mysql is not connected");
+        return '0';
+    }
 
-global.allowed_app_ids = [];
-//allowed_app_ids.push('APP01');
+    executeQuery(mysql_pool, query, function (err, rows) {
+        if (!err) {
+            callback(null,rows, db_Obj);
+        }
+        else {
+            callback(true,err, db_Obj);
+        }
+    });
+};
 
-global.usesemanticbroker    = '10.10.202.114';
 
-// CSE core
-require('./app');

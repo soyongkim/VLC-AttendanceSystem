@@ -51,11 +51,11 @@ var sgn = require('./mobius/sgn');
 
 var db = require('./mobius/db_action');
 var db_sql = require('./mobius/sql_action');
-var ps_app = require('./viip/ps_app');
+var is_app = require('./viip/is_app');
 
 
 console.log = require('debug')('viip:log');
-var debug = require('debug')('viip:ps')
+var debug = require('debug')('viip:is')
 
 var app = express();
 
@@ -548,7 +548,7 @@ if (use_clustering) {
                     });
                 }
             }
-            ps_app.init();
+            //is_app.init();
         });
     }
 }
@@ -596,7 +596,7 @@ else {
 
                     });
                 }
-                ps_app.init();
+                is_app.init();
             });
         }
     });
@@ -1878,7 +1878,7 @@ function lookup_create(request, response) {
                     }
                     else if ((ty == 4) && (parent_comm.ty == 3)) { // contentInstance
                         // process viip task
-                        ps_app.process_cin_vlc_data(parent_comm, body_Obj, ty);
+                        is_app.process_request(parent_comm, body_Obj, ty);
                     }
                     else if ((ty == 24) && (parent_comm.ty == 2 || parent_comm.ty == 3 || parent_comm.ty == 4 || parent_comm.ty == 29)) { // semanticDescriptor
                     }

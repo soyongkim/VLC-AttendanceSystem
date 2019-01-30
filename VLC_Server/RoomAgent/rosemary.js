@@ -88,8 +88,8 @@ else if (process.env.NODE_ENV === 'development') {
 
     // my CSE information
     global.usecsetype           = 'mn'; // select 'in' or 'mn' or 'asn'
-    global.usecsebase           = 'vlcManager';
-    global.usecseid             = '/vlcManager';
+    global.usecsebase           = 'RoomAgent';
+    global.usecseid             = '/RoomAgent';
     global.usecsebaseport       = conf.csebaseport;
 
     global.usedbhost            = 'localhost';

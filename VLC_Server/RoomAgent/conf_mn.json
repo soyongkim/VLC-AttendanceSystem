@@ -1,8 +1,8 @@
 {
     "parent" : {
-        "cbname": "Mobius",
-        "cbcseid": "/Mobius",
-        "cbhost": "155.230.34.228",
+        "cbname": "AAServer",
+        "cbcseid": "/AAServer",
+        "cbhost": "192.168.34.2",
         "cbhostport": "7579",
         "cbprotocol": "http",
         "mqttbroker": "127.0.0.1"
