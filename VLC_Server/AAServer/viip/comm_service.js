@@ -235,7 +235,7 @@ const crt_cnt = (cnt, parent, origin) => {
 };
 
 /**
- * make Contents Instance in Server
+ * make Contents Instance
  *
  * @param {*} cnt
  * @param {*} content

@@ -39,30 +39,38 @@ exports.process_request = function(parent, body_Obj, ty) {
             check_vr_msg(con.vtid, con.vaid, con.flag, con.aid, con.cookie);
         }
     } else if(url.parse(parent['ri']).pathname.split('/')[2] == 'cnt-ExternalRequest') {
-        if(con == 'start')
-            startService();
+        if(con.messageType == 'start')
+            startService(con);
     }
 }
 
-const startService = () => {
-    make_frame_msg(1, 1, `padding`);
+const startService = (con) => {
+    active_service_table.push({
+        name: con.name,
+        locationID: con.locationID,
+        Time: con.onRef
+    });
+    make_frame_msg(con.locationID, `*`, 1, 1, `padding`);
     wdt.set_wdt(wdt_id, 60, serviceChange);
 }
 
 const serviceChange = () => {
     wdt.del_wdt(wdt_id);
-    make_frame_msg(1, 2, `padding`);
+    make_frame_msg(con.locationID, `*`, 1, 2, `padding`);
     wdt.set_wdt(wdt_id, 60, stopService);
 }
 
 const stopService = () => {
     wdt.del_wdt(wdt_id);
-    make_frame_msg(0, 0, `padding`);
+    make_frame_msg(con.locationID, `*`, 0, 0, `padding`);
 }
 
-
-const make_frame_msg = (type, flag, aid) => {
-
+const make_frame_msg = (vaid, vtid, type, flag, aid) => {
+    var contents = {};
+    contents.type = type;
+    contents.flag = flag;
+    contents.aid = aid;
+    comm.crt_cin(`/${vaid}/${vtid}/`, contents, conf.cse.id);
 }
 
 const check_ar_msg = (vtid, vaid, flag, aid) => {

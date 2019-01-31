@@ -1,8 +1,4 @@
 const SerialPort = require('serialport');
-const serialPortBuffer = Buffer.alloc(conf.serial[0].bufferLength);
-
-const crypto = require('crypto');
-
 
 let serialport = null;
 var ports = [];
@@ -27,6 +23,8 @@ conf.serial[serialnum].bufferLength = 20;
 conf.serial[serialnum].options = {};
 conf.serial[serialnum].options.baudRate = 115200;
 
+const serialPortBuffer = Buffer.alloc(conf.serial[0].bufferLength);
+
 // Initailize IS
 const init = () => {
     init_serialport();
@@ -49,7 +47,7 @@ const init_serialport = () => {
 };
 
 
-exports.make_frame = (path_arr, cinObj) => {
+const make_frame = (path_arr, cinObj) => {
     var cin = {};
     cin.ctname = path_arr[path_arr.length-2];
     cin.con = (cinObj.con != null) ? cinObj.con : cinObj.content;
@@ -113,4 +111,4 @@ const set_frame = (frame) => {
 }
 
 exports.init = init;
-exports.set_vt_device = set_vt_device;
+exports.make_frame = make_frame;

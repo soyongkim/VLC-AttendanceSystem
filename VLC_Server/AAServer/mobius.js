@@ -24,8 +24,8 @@ global.defaultbodytype      = 'json';
 
 // my CSE information
 global.usecsetype           = 'in'; // select 'in' or 'mn' or asn'
-global.usecsebase           = 'AAServer';
-global.usecseid             = '/AAServer';
+global.usecsebase           = 'IT5';
+global.usecseid             = '/IT5';
 global.usecsebaseport       = conf.csebaseport;
 
 global.usedbhost            = 'localhost';
