@@ -5,6 +5,7 @@ const crypto = require('crypto');
 
 const conf = require('./va_conf.js');
 const comm = require('./comm_service');
+const sql = require('../mobius/sql_action');
 
 console.log = require('debug')('hidden:va');
 const debug = require('debug')('viip:va');
@@ -20,35 +21,21 @@ const init = () => {
 
 exports.process_request = function(parent, body_Obj, ty) {
     if (ty != '4') {
-      return ty;
+        return ty;
     }
     var con = body_Obj['cin']['con'];
-
-    if(con == "") {
-      console.log("Data is nothing:");
-      return;
-    }
-
-    // Container route
-    if(url.parse(parent['ri']).pathname.split('/')[2] == 'cnt-VLC-Message') {
-        make_msg(con.type, con.flag, con.aid);
-    } else if(url.parse(parent['ri']).pathname.split('/')[2] == 'cnt-AR-Message') {
-        check_ar_msg(vtid, vaid, flag, aid);
-    }  else if(url.parse(parent['ri']).pathname.split('/')[2] == 'cnt-AR-Message') {
-        check_vr_msg(vtid, vaid, flag, aid, cookie);
-    }
-}
-
-const make_msg = (type, flag, aid) => {
-
-}
-
-const check_ar_msg = (vtid, vaid, flag, aid) => {
     
-}
+    sql.retrieve_all_ae(function(err, result) {
+        debug(`err:${err} result:${JSON.stringify(result)}`)
+    });
 
-const check_vr_msg = (vtid, vaid, flag, aid, cookie) => {
+    // redirect message if path is /R314/VT or /R314/* 
+    if(url.parse(parent['ri']).pathname.split('/')[2] == '*') {
+        // ae 검색하고 있는 ae에게 전부 메시지만들어서 전달하면 될 듯
+        make_msg(con.type, con.flag, con.aid);
+    } else {
 
+    }
 }
 
 exports.init = init;

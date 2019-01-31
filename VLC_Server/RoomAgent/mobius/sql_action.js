@@ -827,6 +827,17 @@ exports.select_ae = function(ri, callback) {
     });
 };
 
+/**
+ * retrieve all AE to broadcast to VT's
+ *
+ * @param {*} callback
+ */
+exports.retrieve_all_ae = function(callback) {
+    var sql = util.format("select * from ae");
+    db.getResult(sql, '', function (err, results_ae) {
+        callback(err, results_ae);
+    });
+};
 
 exports.search_parents_lookup = function(ri, pi_list, result_ri, callback) {
     // //var sql = util.format("select ri from lookup where (ri =\'%s\') or ((pi=\'%s\' or pi like \'%s/%%\') and ty != \'1\' and ty != \'4\' and ty != \'23\' and ty != \'30\' and ty != \'9\' and ty != \'17\')", ri, ri, ri);

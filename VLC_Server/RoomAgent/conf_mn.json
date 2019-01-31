@@ -1,7 +1,7 @@
 {
     "parent" : {
-        "cbname": "AAServer",
-        "cbcseid": "/AAServer",
+        "cbname": "IT5",
+        "cbcseid": "/IT5",
         "cbhost": "192.168.34.2",
         "cbhostport": "7579",
         "cbprotocol": "http",

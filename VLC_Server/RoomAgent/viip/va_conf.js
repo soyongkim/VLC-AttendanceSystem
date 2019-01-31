@@ -16,14 +16,8 @@ conf.cse.id = `/${conf.cse.name}`;
 conf.cnt = [];
 conf.cnt.push({
     parent: `/${conf.cse.name}`,
-    name: 'cnt-IS-Message',
-    label: ['IS->VA->*(VT)']
-});
-
-conf.cnt.push({
-    parent: `/${conf.cse.name}`,
-    name: 'cnt-Client-Message',
-    label: ['Client->VA->IS Request']
+    name: '*',
+    label: ['Refer to all VTs in VA']
 });
 
 conf.ae = [];
