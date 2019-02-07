@@ -2170,7 +2170,7 @@ const _create_schedule_table = function(code, callback) {
 exports.insert_schedule_atd = function(code, value) {
     var tid = require('shortid').generate();
     console.time('insert_attendee_in_schedule ' + tid);
-    var sql = util.format(`insert into ${code} (atd_id, atd_name) ${value}`);
+    var sql = util.format(`insert into ${code} (atd_id, atd_name, state) ${value}`);
     db.getResult(sql, '', function(err, result) {
         console.timeEnd('insert_attendee_in_schedule ' + tid);
         if(!err)
@@ -2187,8 +2187,19 @@ exports.select_schedule_atd = function(code, aid, callback) {
     });
 };
 
-exports.update_schedule_atd = function(code, aid, state, callback) {
-    var sql = util.format(`update ${code} set state = \'${state}\' where aid = \'${aid}\'`);
+exports.select_all_atd = function(code, callback) {
+    var sql = util.format(`select * from ${code}`);
+    db.getResult(sql, '', function (err, results) {
+        callback(err, results);
+    });
+};
+
+exports.update_schedule_atd = function(code, aid, state, req, callback) {
+    var sql = '';
+    if(req == `spec`)
+       sql = util.format(`update ${code} set state = \'${state}\' where aid = \'${aid}\'`);
+    else if(req == 'rest')
+       sql = util.format(`update ${code} set state = \'${state}\' where state = \'wait\'`);
     db.getResult(sql, '', function (err, results) {
         callback(err, results);
     });

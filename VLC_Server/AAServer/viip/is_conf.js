@@ -121,7 +121,7 @@ conf.cin = [];
 conf.schedule = [];
 conf.schedule.push({
     name: `comp_724`,
-    locationID: `R529`,
+    locationID: `R314`,
     time: [
         `08:00`,
         `08:15`,
@@ -136,7 +136,7 @@ conf.schedule.push({
 
 conf.schedule.push({
     name: 'itec_401',
-    locationID: `R527`,
+    locationID: `R314`,
     time: [
         `08:00`,
         `08:15`,
