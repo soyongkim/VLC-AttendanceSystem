@@ -822,6 +822,19 @@ exports.select_csr = function(ri, callback) {
     });
 };
 
+/**
+ * found mn-resource from poa (for matching va info)
+ *
+ * @param {*} poa
+ * @param {*} callback
+ */
+exports.select_csr_poa = function(poa, callback) {
+    var sql = util.format("select * from csr where poa = \'%s\'", poa);
+    db.getResult(sql, '', function (err, results_csr) {
+        callback(err, results_csr);
+    });
+}
+
 exports.select_ae = function(ri, callback) {
     var sql = util.format("select * from ae where ri = \'%s\'", ri);
     db.getResult(sql, '', function (err, results_ae) {
@@ -2112,5 +2125,71 @@ exports.select_latest_check = function(index, sid) {
                 return reject(err);
             }
         });
+    });
+};
+
+exports.create_schdule_table = function(code, callback) {
+    var tid = require('shortid').generate();
+    console.time('check_schedule_table ' + tid);
+    var sql = util.format(`DROP TABLE IF EXISTS \`${code}\``);
+    db.getResult(sql, '', function(err, res) {
+        console.timeEnd('check_schedule_table ' + tid);
+        if(!err) {
+            _create_schedule_table(code, function(err, result_Obj) {
+                callback(err, result_Obj);
+            });
+        }
+        else 
+            debug(`>> creation check error : ${err} || ${JSON.stringify(res)}`);
+    });
+};
+
+const _create_schedule_table = function(code, callback) {
+    var tid = require('shortid').generate();
+    console.time('create_schedule_table ' + tid);
+    var sql = util.format(`
+    CREATE TABLE \`${code}\` (
+        \`atd_id\` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+        \`atd_name\` varchar(45) NOT NULL,
+        \`state\` varchar(40) NOT NULL,
+        PRIMARY KEY (\`atd_id\`),
+        UNIQUE KEY \`path_UNIQUE\` (\`atd_id\`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    `);
+    db.getResult(sql, '', function(err, result_Obj) {
+        console.timeEnd('create_schedule_table ' + tid);
+        if(!err) {
+            debug(`>> ${code} table creation complete`);
+            callback(err, result_Obj);
+        }
+        else 
+            debug(`>> creation error : ${err} || ${result_Obj}`);
+    });
+};
+
+exports.insert_schedule_atd = function(code, value) {
+    var tid = require('shortid').generate();
+    console.time('insert_attendee_in_schedule ' + tid);
+    var sql = util.format(`insert into ${code} (atd_id, atd_name) ${value}`);
+    db.getResult(sql, '', function(err, result) {
+        console.timeEnd('insert_attendee_in_schedule ' + tid);
+        if(!err)
+            debug(`>> attedee insert complete`);
+        else 
+            debug(`>> insert attendee error : ${JSON.stringify(result)}`);
+    });
+};
+
+exports.select_schedule_atd = function(code, aid, callback) {
+    var sql = util.format(`select * from ${code} where atd_id = \'${aid}\'`);
+    db.getResult(sql, '', function (err, results) {
+        callback(err, results);
+    });
+};
+
+exports.update_schedule_atd = function(code, aid, state, callback) {
+    var sql = util.format(`update ${code} set state = \'${state}\' where aid = \'${aid}\'`);
+    db.getResult(sql, '', function (err, results) {
+        callback(err, results);
     });
 };

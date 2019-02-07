@@ -511,3 +511,10 @@ CREATE TABLE `tsi` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2018-05-15  0:31:22
+
+-- Create Attendance Schedule Table
+
+DROP TABLE IF EXISTS `comp_724`;
+DROP TABLE IF EXISTS `comp_402`;
+DROP TABLE IF EXISTS `itec_401`;
+

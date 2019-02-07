@@ -27,17 +27,17 @@ global.mode = 'vt';
 conf.useprotocol = 'http'; // select one for 'http' or 'mqtt' or 'coap' or 'ws'
 
 // build cse
-cse.host        = '192.168.228.1';
+cse.host        = '192.168.34.2';
 cse.port        = '7599';
-cse.name        = 'RoomAgent';
-cse.id          = '/RoomAgent';
+cse.name        = 'R314';
+cse.id          = '/R314';
 cse.mqttport    = '1883';
 cse.wsport      = '7577';
 
 // build ae
 if(mode === 'vt') {
   ae.name         = 'VT1';
-  ae.appid        = 'VLCTransmitter';
+  ae.appid        = 'VLCTransmitter';                                                                                                                                                                                                                                               
 }
 else {
   ae.name         = 'VR1';

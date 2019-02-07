@@ -59,9 +59,7 @@ const make_frame = (path_arr, cinObj) => {
         debug('<---- send to VT Device');
         var frame = {};
         frame.vtid = cin.con['vtid'];
-        frame.vaid = cin.con['vaid'];
         frame.type = cin.con['type'];
-        frame.aflag = cin.con['aflag'];
         frame.cookie = cin.con['cookie'];
         frame.aid = cin.con['aid'];
         set_frame(frame);
@@ -73,25 +71,19 @@ const set_frame = (frame) => {
     return new Promise((resolve, reject) => {
         for(var i=0; i<conf.serial.length; i++) {
             if(conf.serial[i].enabled == true && conf.serial[i].id == vtid) {
-                debug(`Set [ vtid(${frame.vtid}) | vaid(${frame.vaid}) | type(${frame.type}) | aflag(${frame.aflag}) | cookie(${frame.cookie} | aid(${frame.aid}) ]`);
+                debug(`Set [ vtid(${frame.vtid}) | type(${frame.type}) | cookie(${frame.cookie} | aid(${frame.aid}) ]`);
                 
                 // vtid (2bytes)
                 serialPortBuffer.write(frame.vtid, 0, 2, 'hex');
 
-                // vaid (2bytes)
-                serialPortBuffer.write(frame.vaid, 2, 4, 'hex');
-
                 // type (1byte)
-                serialPortBuffer.write(frame.type, 4, 5, 'hex');
+                serialPortBuffer.write(frame.type, 2, 3, 'hex');
 
-                // attendance flag (1byte)
-                serialPortBuffer.write(frame.aflag, 5, 6, 'hex');
+                // cookie id or ateendee mapping id (10bytes) 
+                serialPortBuffer.write(frame.cookie, 3, 13, 'hex');
 
-                // cookie id (4bytes)
-                serialPortBuffer.write(frame.cookie, 6, 10, 'hex');
-
-                // attendee id (10bytes)
-                serialPortBuffer.write(frame.aid, 10, 20, 'hex');
+                // attendee id (2bytes)
+                serialPortBuffer.write(frame.aid, 13, 15, 'hex');
 
                 debug(`Write to serialPort (${serialPortBuffer.toString('hex')})`);
             

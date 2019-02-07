@@ -1878,7 +1878,7 @@ function lookup_create(request, response) {
                     }
                     else if ((ty == 4) && (parent_comm.ty == 3)) { // contentInstance
                         // process viip task
-                        is_app.process_request(parent_comm, body_Obj, ty);
+                        is_app.process_request(request, parent_comm, body_Obj, ty);
                     }
                     else if ((ty == 24) && (parent_comm.ty == 2 || parent_comm.ty == 3 || parent_comm.ty == 4 || parent_comm.ty == 29)) { // semanticDescriptor
                     }
@@ -2495,6 +2495,9 @@ app.get(onem2mParser, function (request, response) {
     // elapsed_tid = require('shortid').generate();
     // elapsed_hrstart[elapsed_tid] = process.hrtime();
     // console.time(elapsed_tid);
+
+    debug(`----------------------------Request Object------------------------------`);
+    debug(`${util.inspect(request.headers)}`);
 
     var fullBody = '';
     request.on('data', function (chunk) {

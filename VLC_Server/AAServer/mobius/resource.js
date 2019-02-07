@@ -1506,12 +1506,12 @@ function build_resource(request, response, ty, body_Obj, callback) {
 
 exports.create = function (request, response, ty, body_Obj, callback) {
     var rootnm = request.headers.rootnm;
-    debug(`----------------------------Request Object------------------------------`);
-    //debug(`${util.inspect(request.headers)}`);
-    debug(`----------------------------Response Object------------------------------`);
-    //debug(`${util.inspect(response)}`);
-    debug(`----------------------------body Object------------------------------`);
-    //debug(`${util.inspect(body_Obj)}`);
+    // debug(`----------------------------Request Object------------------------------`);
+    // debug(`${util.inspect(request.headers)}`);
+    // debug(`----------------------------Response Object------------------------------`);
+    // //debug(`${util.inspect(response)}`);
+    // debug(`----------------------------body Object------------------------------`);
+    // debug(`${util.inspect(body_Obj)}`);
 
     build_resource(request, response, ty, body_Obj, function (rsc, resource_Obj) {
         if (rsc == '0') {
