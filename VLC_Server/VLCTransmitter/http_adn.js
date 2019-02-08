@@ -352,6 +352,7 @@ exports.crtci = function(parent, count, content, socket, callback) {
     }
 
     http_request(parent, 'post', '4', bodyString, function (res, res_body) {
-        callback(res.headers['x-m2m-rsc'], res_body, parent, socket);
+        // send to tas, but not use in vlc-iot
+        //callback(res.headers['x-m2m-rsc'], res_body, parent, socket);
     });
 };

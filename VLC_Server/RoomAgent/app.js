@@ -1869,6 +1869,8 @@ function lookup_create(request, response) {
                     else if ((ty == 10) && (parent_comm.ty == 5)) { // locationPolicy
                     }
                     else if ((ty == 2) && (parent_comm.ty == 5)) { // ae
+                        debug(`-- VT mapping --`)
+                        //viip_va.mapping_vt_info(body_Obj);
                     }
                     else if ((ty == 3) && (parent_comm.ty == 5 || parent_comm.ty == 2 || parent_comm.ty == 3)) { // container
                     }

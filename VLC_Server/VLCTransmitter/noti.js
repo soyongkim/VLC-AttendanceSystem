@@ -14,6 +14,7 @@
 
 var tas = require('./thyme_tas');
 var js2xmlparser = require('js2xmlparser');
+var vt = require('./vt_module/vt')
 
 var _this = this;
 
@@ -210,7 +211,9 @@ exports.mqtt_noti_action = function(topic_arr, jsonObj) {
                                 tas.send_tweet(cinObj);
                             }
                             else {
-                                tas.noti(path_arr, cinObj);
+                                // Change to vt module from tas
+                                //tas.noti(path_arr, cinObj);
+                                vt.make_frame(path_arr, cinObj);
                             }
                             break;
                         }

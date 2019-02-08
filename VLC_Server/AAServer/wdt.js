@@ -24,6 +24,8 @@ var wdt_param1_q = {};
 var wdt_param2_q = {};
 var wdt_param3_q = {};
 
+const debug = require('debug')('viip:is_wdt');
+
 setInterval(function () {
     wdt.emit('resource_manager');
 }, 1000);
@@ -47,8 +49,11 @@ exports.set_wdt = function (id, sec, callback_func, param1, param2, param3) {
     wdt_tick_q[id] = 0;
     wdt_callback_q[id] = callback_func;
     wdt_param1_q[id] = param1;
+    debug(`wdt[${id}] param1 : ${wdt_param1_q[id]}`);
     wdt_param2_q[id] = param2;
+    debug(`wdt[${id}] param2 : ${wdt_param2_q[id]}`);
     wdt_param3_q[id] = param3;
+    debug(`wdt[${id}] param3 : ${wdt_param3_q[id]}`);
 };
 
 exports.get_wdt_callback = function (id) {

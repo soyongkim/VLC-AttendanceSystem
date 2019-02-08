@@ -1,7 +1,11 @@
 const SerialPort = require('serialport');
+const debug = require('debug')('viip:vt');
 
 let serialport = null;
 var ports = [];
+
+// frame state
+var frmState = `idle`;
 
 // keep temporarily
 var serialnum = 0;
@@ -28,6 +32,7 @@ const serialPortBuffer = Buffer.alloc(conf.serial[0].bufferLength);
 // Initailize IS
 const init = () => {
     init_serialport();
+    wdt.set_wdt(require('shortid').generate(), 5, timer_upload_action);
 };
 
 /**
@@ -63,6 +68,11 @@ const make_frame = (path_arr, cinObj) => {
         frame.cookie = cin.con['cookie'];
         frame.aid = cin.con['aid'];
         set_frame(frame);
+
+        if(cin.con['type'] == 0)
+            frmState = `idle`;
+        else 
+            frmState = `active`;
     }
 }
 
@@ -100,6 +110,27 @@ const set_frame = (frame) => {
             }
         }
     });
+}
+
+// hb send 
+function timer_upload_action() {
+    if (sh_state == 'crtci' && mode === 'vt') {
+        for (var j = 0; j < conf.cnt.length; j++) {
+            if (conf.cnt[j].name == 'vt_heartbeat') {
+                //var content = JSON.stringify({value: 'TAS' + t_count++});
+                //var content = '[state]' + parseInt(Math.random()*100).toString();
+                var content = {};
+                content.state = frmState;
+                content.vtid = '/' + conf.ae.name;
+                debug(`HEARTBEAT Message Send [VT state]: ${content['state']} [VT ID]: ${content['vtid']} ---->`);
+                var parent = conf.cnt[j].parent + '/' + conf.cnt[j].name;
+                sh_adn.crtci(parent, j, content, this, function (status, res_body, to, socket) {
+                    //console.log('x-m2m-rsc : ' + status + ' <----');
+                });
+                break;
+            }
+        }
+    }
 }
 
 exports.init = init;

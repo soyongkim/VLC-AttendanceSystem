@@ -54,13 +54,16 @@ if(mode === 'vt') {
   // build cnt
   cnt_arr[count] = {};
   cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
-  cnt_arr[count++].name = 'cnt-IS-Message';
+  cnt_arr[count++].name = 'is_Message';
+  cnt_arr[count] = {};
+  cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+  cnt_arr[count++].name = 'vt_heartbeat';
 
   // build sub
   count = 0;
   sub_arr[count] = {};
   sub_arr[count].parent = '/' + cse.name + '/' + ae.name + '/' + cnt_arr[count].name;
-  sub_arr[count].name = 'sub-IS-Message';
+  sub_arr[count].name = 'sub-is_Message';
   sub_arr[count++].nu = 'mqtt://' + cse.host + '/' + ae.id + '?ct=json'; // mqtt
 }
 else {

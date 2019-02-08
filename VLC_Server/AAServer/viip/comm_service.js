@@ -50,10 +50,12 @@ const onem2m_http_request = (path, method, ty, bodyString, origin) => {
 
             res.on('end', () => {
                 res_body = Buffer.concat(res_body).toString();
-                const json_body = JSON.parse(res_body);
-
-                //debug(json_body['m2m:dbg']);
-
+                var json_body = '';
+                try {
+                    json_body = JSON.parse(res_body);
+                } catch (e) {
+                    json_body = 'error';
+                }
                 return resolve({ res: res, res_body: json_body });
             });
         });
@@ -152,8 +154,9 @@ const crt_ae = (ae_info) => {
     return new Promise((resolve, reject) => {
         onem2m_http_request(ae_info.parent, 'post', '2', bodyString, ae_info.id).then((result) => {
             const { res, res_body } = result;
-
-            const status = res.headers['x-m2m-rsc'];
+            var status = '';
+            if(res.headers)
+                status = res.headers['x-m2m-rsc'];
 
             if (status === '2001') {
                 // AE Created (2001)
@@ -220,10 +223,13 @@ const crt_cnt = (cnt, parent, origin) => {
     return new Promise((resolve, reject) => {
         onem2m_http_request(parent, 'post', '3', bodyString, origin).then((result) => {
             const { res, res_body } = result;
-            const status = res.headers['x-m2m-rsc'];
+            var status = '';
+            if(res.headers)
+                status = res.headers['x-m2m-rsc'];
 
-            if (res.headers['x-m2m-rsc'] === '2001') {
-                //debug(`-- ${results_ct['m2m:cnt'].rn} container creation complete`)
+            if (status === '2001') {
+                // AE Created (2001)
+                resolve(status);
             }
 
             return resolve(status);
@@ -252,11 +258,13 @@ const crt_cin = (cnt, content, origin) => {
     bodyString = JSON.stringify(results_ci);
 
     onem2m_http_request(cnt, 'post', '4', bodyString, origin).then((result) => {
-        const { res, res_body } = result;
+        var status = '';
+        if(result.headers)
+            status = result.headers['x-m2m-rsc'];
 
-        if (res.headers['x-m2m-rsc'] === '2001') {
-            //debug('Result : ' + cnt + '- x-m2m-rsc : ' + res.headers['x-m2m-rsc'] + '<----' );
-            //debug('POST(' + cnt + ') : Request Success');
+        if (status === '2001') {
+            // AE Created (2001)
+            resolve(status);
         }
         else {
             //debug(cnt + '- x-m2m-rsc : ' + res.headers['x-m2m-rsc'] + '<----' ); 
@@ -271,10 +279,13 @@ const test_get = () => {
     var cnt = `/${conf.cse.name}/`;
     var bodyString = '';
     onem2m_http_request(cnt, 'get', 3, bodyString).then((result) => {
-        const { res, res_body } = result;
-        if (res.headers['x-m2m-rsc'] === '2000') {
-            debug('Result : ' + cnt + '- x-m2m-rsc : ' + res.headers['x-m2m-rsc'] + ' <----');
-            debug(`TEST:${JSON.stringify(res_body['m2m:cnt'].or)}`);
+        var status = '';
+        if(result.headers)
+            status = result.headers['x-m2m-rsc'];
+
+        if (status === '2001') {
+            // AE Created (2001)
+            resolve(status);
         }
         //debug('POST(' + cnt + ') : Request Success');
     });

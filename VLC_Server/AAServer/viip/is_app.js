@@ -6,7 +6,7 @@ const conf = require('./is_conf.js');
 const comm = require('./comm_service');
 const sql = require('../mobius/sql_action');
 
-var wdt_id = require('shortid').generate();
+var idgen = require('shortid');
 
 console.log = require('debug')('hidden:is_ae');
 const debug = require('debug')('viip:is_ae');
@@ -49,8 +49,19 @@ exports.process_request = function (request, parent, body_Obj, ty) {
             }
         });
     } else if (cnt_rsc_nm == 'cnt-ExternalRequest') {
-        if (con.type == 'start')
-            startService(con);
+        if (con.type == 'start') {
+            var dup = 'x';
+            for(var i=0; i<active_service_table.length; i++) {
+                if(active_service_table[i].name == con.name) {
+                   dup = 'o';
+                   break;
+                }
+            }
+            if(dup == 'x')
+                startService(con);
+        }
+        else if (con.type == 'check')
+            check_mapping_table();
     }
 }
 
@@ -72,62 +83,69 @@ const registerSchedule = (scheduleInfo) => {
             }
         });
     });
-}
+};
 
 const startService = (con) => {
     for (var i = 0; i < conf.schedule.length; i++) {
         debug(`> i count: ${i} | conf : ${conf.schedule[i].name} | con: ${con.name}`);
         if (conf.schedule[i].name == con.name) {
-            debug(`-- Start Service (${con.name}) -- `);
+            debug(`-- Start Service (${con.name}) -- location: ${conf.schedule[i].locationID}`);
             active_service_table.push({
                 name: conf.schedule[i].name,
                 locationID: conf.schedule[i].locationID,
                 time: conf.schedule[i].time,
                 state: 'approval'
             });
-            debug(`-- locationID: (${conf.schedule[i].locationID}) -- `);
             make_frame_msg(conf.schedule[i].locationID, `*`, 1, ``, ``);
             check_mapping_table();
-            setTimeout(function() {
-                changeService(con.name, active_service_table.length-1);
-            }, 5000);
+
+            var wdt_id = idgen.generate();
+            wdt.set_wdt(wdt_id, 5, changeService, con.name, wdt_id);
             break;
         }
     }
 }
 
-const changeService = (name, index) => {
-    debug(`>>>>index: ${index}`);
-    if (active_service_table[index].name == name) {
-        active_service_table[index].state = 'late';
-        debug(`-- Change Service (${name})--`);
-        check_mapping_table();
-        setTimeout(function() {
-            stopService(name, index);
-        }, 5000);
+const changeService = (wdt_id, name) => {
+    debug(`argument check: ${name} | ${wdt_id}`);
+    wdt.del_wdt(wdt_id);
+    for(var i=0; i< active_service_table.length; i++) {
+        if(name == active_service_table[i].name) {
+            debug(`>> Change Service[${active_service_table[i].name} : ${i}]`);
+            active_service_table[i].state = 'late';
+            check_mapping_table();
+            wdt.set_wdt(wdt_id, 5, stopService, name, wdt_id);
+            break;
+        }
     }
 }
 
-const stopService = (name, index) => {
-    if (active_service_table[index].name == name) {
-        sql.update_schedule_atd(name, '', 'x', 'rest', function(err, res) {
-            if(!err) {
-                make_frame_msg(active_service_table[index].locationID, `*`, 0, ``, ``);
-                active_service_table.splice(index, 1);
-                debug(`-- Stop Service (${name})--`);
-            } else {
-                debug(`>> Error : Stop Service ${JSON.stringify(res)}--`);
-            }
-        });
-        check_mapping_table();
+const stopService = (wdt_id, name) => {
+    debug(`argument check: ${name} | ${wdt_id}`);
+    wdt.del_wdt(wdt_id);
+    for(var i=0; i< active_service_table.length; i++) {
+        if(name == active_service_table[i].name) {
+            sql.update_schedule_atd(active_service_table[i].name, '', 'x', 'rest', function (err, res) {
+                if (!err) {
+                    make_frame_msg(active_service_table[i].locationID, `*`, 0, ``, ``);
+                    debug(`>> Stop Service[${active_service_table[i].name}]`);
+                    active_service_table.splice(i, 1);
+                } else {
+                    debug(`>> Error : Stop Service ${JSON.stringify(res)}--`);
+                }
+            });
+            check_mapping_table();
+            break;
+        }
     }
 }
 
 const check_mapping_table = () => {
     debug(`---- check active mapping table ----`)
-    for(var i=0; i<active_service_table.length; i++) {
-        debug(`[${i} comlum] name: ${active_service_table[i].name} | state: ${active_service_table[i].state}`);
+    for (var i = 0; i < active_service_table.length; i++) {
+        debug(`[${i}] name: ${active_service_table[i].name} | state: ${active_service_table[i].state}`);
     }
+    debug(`---- check end ----`)
 };
 
 const make_frame_msg = (va_location, vtid, type, cookie, aid) => {
@@ -168,9 +186,9 @@ const check_ar_msg = (con) => {
 
 const check_vr_msg = (con) => {
     for (var i = 0; i < cookie_mapping_table.length; i++) {
-        if(con.cookie == cookie_mapping_table[i].cookie) {
-            sql.update_schedule_atd(code, cookie_mapping_table[i].code, cookie_mapping_table[i].aid, cookie_mapping_table[i].state, 'spec',function(err, res) {
-                if(!err) {
+        if (con.cookie == cookie_mapping_table[i].cookie) {
+            sql.update_schedule_atd(code, cookie_mapping_table[i].code, cookie_mapping_table[i].aid, cookie_mapping_table[i].state, 'spec', function (err, res) {
+                if (!err) {
                     debug(`>> ${cookie_mapping_table[i].aid} complete attendance!`);
                     make_frame_msg(con.locationID, con.vtid, 3, ``, con.aid);
                     cookie_mapping_table.splice(i, 1);

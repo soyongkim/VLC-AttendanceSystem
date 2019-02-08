@@ -231,7 +231,12 @@ const crt_cnt = (cnt, parent, origin) => {
       }
       //debug(res_body);
     });
+};
 
+const del_rsc = (target, type, origin) => {
+    onem2m_http_request(target, 'delete', type, '', origin).then((result) => {
+        debug(`>> ${target} rsc delete request state : ${result}`);
+    });
 };
 
 /**
@@ -265,6 +270,8 @@ const crt_cin = (cnt, content, origin) => {
   });
 };
 
+
+
 // test that the resources required to Server is made well
 const test_get = () => {
     var cnt = `/${conf.cse.name}/`;
@@ -283,3 +290,4 @@ exports.init = init;
 exports.crt_ae = crt_ae;
 exports.crt_cnt = crt_cnt;
 exports.crt_cin = crt_cin;
+exports.del_rsc = del_rsc;

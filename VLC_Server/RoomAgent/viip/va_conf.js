@@ -19,6 +19,17 @@ conf.cnt.push({
     name: '*',
     label: ['Refer to all VTs in VA']
 });
+conf.cnt.push({
+    parent: `/${conf.cse.name}`,
+    name: 'specVT',
+    label: ['Refer to specific VT in VA']
+});
+conf.cnt.push({
+    parent: `/${conf.cse.name}`,
+    name: 'ExternalRequest',
+    label: ['for debug']
+});
+
 
 conf.ae = [];
 
