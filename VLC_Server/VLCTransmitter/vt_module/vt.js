@@ -63,16 +63,18 @@ const make_frame = (path_arr, cinObj) => {
         // you can modify if you want to change the frame structure
         debug('<---- send to VT Device');
         var frame = {};
-        frame.vtid = cin.con['vtid'];
+        frame.vtid = conf.ae.name;
         frame.type = cin.con['type'];
-        frame.cookie = cin.con['cookie'];
-        frame.aid = cin.con['aid'];
+        frame.cookie = (cin.con['cookie'] != "") ? cin.con['cookie'] : "0000";
+        frame.aid = (cin.con['aid'] != "") ? ascii_to_hexa(cin.con['aid']) : "0000000000";
         set_frame(frame);
 
         if(cin.con['type'] == 0)
             frmState = `idle`;
         else 
             frmState = `active`;
+
+        debug(`ascii test : ${conf.ae.name} => ${frame.vtid}`);
     }
 }
 
@@ -80,20 +82,21 @@ const make_frame = (path_arr, cinObj) => {
 const set_frame = (frame) => {
     return new Promise((resolve, reject) => {
         for(var i=0; i<conf.serial.length; i++) {
-            if(conf.serial[i].enabled == true && conf.serial[i].id == vtid) {
-                debug(`Set [ vtid(${frame.vtid}) | type(${frame.type}) | cookie(${frame.cookie} | aid(${frame.aid}) ]`);
+            if(conf.serial[i].enabled == true && conf.serial[i].id == `/${frame.vtid}`) {
+                debug(`Set [ vtid(${frame.vtid}) | type(${frame.type}) | cookie(${frame.cookie}) | aid(${frame.aid}) ]`);
                 
-                // vtid (2bytes)
-                serialPortBuffer.write(frame.vtid, 0, 2, 'hex');
+                // vtid (4bytes)
+                serialPortBuffer.write(ascii_to_hexa(frame.vtid), 0, 4, 'hex');
 
-                // type (1byte)
-                serialPortBuffer.write(frame.type, 2, 3, 'hex');
+                // type (2bytes)
+                //serialPortBuffer.write(frame.type, 4, 6, 'hex');
+                serialPortBuffer.writeInt16BE(frame.type, 4, true);
 
-                // cookie id or ateendee mapping id (10bytes) 
-                serialPortBuffer.write(frame.cookie, 3, 13, 'hex');
+                // cookie id or ateendee mapping id (4bytes) 
+                serialPortBuffer.write(frame.cookie, 6, 10, 'hex');
 
-                // attendee id (2bytes)
-                serialPortBuffer.write(frame.aid, 13, 15, 'hex');
+                // attendee id (10bytes)
+                serialPortBuffer.write(frame.aid, 10, 20, 'hex');
 
                 debug(`Write to serialPort (${serialPortBuffer.toString('hex')})`);
             
@@ -112,6 +115,16 @@ const set_frame = (frame) => {
     });
 }
 
+const ascii_to_hexa = (str) => {
+	var arr1 = [];
+	for (var n = 0, l = str.length; n < l; n++) 
+     {
+		var hex = Number(str.charCodeAt(n)).toString(16);
+		arr1.push(hex);
+	 }
+	return arr1.join('');
+   }
+
 // hb send 
 function timer_upload_action() {
     if (sh_state == 'crtci' && mode === 'vt') {
@@ -121,7 +134,7 @@ function timer_upload_action() {
                 //var content = '[state]' + parseInt(Math.random()*100).toString();
                 var content = {};
                 content.state = frmState;
-                content.vtid = '/' + conf.ae.name;
+                content.vtid = conf.ae.name;
                 debug(`HEARTBEAT Message Send [VT state]: ${content['state']} [VT ID]: ${content['vtid']} ---->`);
                 var parent = conf.cnt[j].parent + '/' + conf.cnt[j].name;
                 sh_adn.crtci(parent, j, content, this, function (status, res_body, to, socket) {

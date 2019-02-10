@@ -822,18 +822,6 @@ exports.select_csr = function(ri, callback) {
     });
 };
 
-/**
- * found mn-resource from poa (for matching va info)
- *
- * @param {*} poa
- * @param {*} callback
- */
-exports.select_csr_poa = function(poa, callback) {
-    var sql = util.format("select * from csr where poa = \'%s\'", poa);
-    db.getResult(sql, '', function (err, results_csr) {
-        callback(err, results_csr);
-    });
-}
 
 exports.select_ae = function(ri, callback) {
     var sql = util.format("select * from ae where ri = \'%s\'", ri);
@@ -2181,7 +2169,7 @@ exports.insert_schedule_atd = function(code, value) {
 };
 
 exports.select_schedule_atd = function(code, aid, callback) {
-    var sql = util.format(`select * from ${code} where atd_id = \'${aid}\'`);
+    var sql = util.format(`select * from ${code} where atd_id = \'%${aid}%\'`);
     db.getResult(sql, '', function (err, results) {
         callback(err, results);
     });
@@ -2204,3 +2192,18 @@ exports.update_schedule_atd = function(code, aid, state, req, callback) {
         callback(err, results);
     });
 };
+
+/**
+ * found mn-resource from poa (for matching va info)
+ *
+ * @param {*} poa
+ * @param {*} callback
+ */
+exports.select_csr_poa = function(poa, callback) {
+    var sql = util.format(`select * from csr where poa like \'%%${poa}%%\'`);
+    //debug(`sql:${sql} | poa:${[poa]}`);
+    db.getResult(sql, '', function (err, results_csr) {
+        //debug(`result:${JSON.stringify(results_csr)}`);
+        callback(err, results_csr);
+    });
+}

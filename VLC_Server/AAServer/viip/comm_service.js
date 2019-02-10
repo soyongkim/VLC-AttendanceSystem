@@ -155,7 +155,7 @@ const crt_ae = (ae_info) => {
         onem2m_http_request(ae_info.parent, 'post', '2', bodyString, ae_info.id).then((result) => {
             const { res, res_body } = result;
             var status = '';
-            if(res.headers)
+            if (res.headers)
                 status = res.headers['x-m2m-rsc'];
 
             if (status === '2001') {
@@ -224,7 +224,7 @@ const crt_cnt = (cnt, parent, origin) => {
         onem2m_http_request(parent, 'post', '3', bodyString, origin).then((result) => {
             const { res, res_body } = result;
             var status = '';
-            if(res.headers)
+            if (res.headers)
                 status = res.headers['x-m2m-rsc'];
 
             if (status === '2001') {
@@ -240,6 +240,21 @@ const crt_cnt = (cnt, parent, origin) => {
         });
     });
 };
+
+
+/**
+ * delete resource
+ *
+ * @param {*} target
+ * @param {*} type
+ * @param {*} origin
+ */
+const del_rsc = (target, type, origin) => {
+    onem2m_http_request(target, 'delete', type, '', origin).then((result) => {
+        debug(`>> ${target} rsc delete request state`);
+    });
+};
+
 
 /**
  * make Contents Instance
@@ -259,7 +274,7 @@ const crt_cin = (cnt, content, origin) => {
 
     onem2m_http_request(cnt, 'post', '4', bodyString, origin).then((result) => {
         var status = '';
-        if(result.headers)
+        if (result.headers)
             status = result.headers['x-m2m-rsc'];
 
         if (status === '2001') {
@@ -280,7 +295,7 @@ const test_get = () => {
     var bodyString = '';
     onem2m_http_request(cnt, 'get', 3, bodyString).then((result) => {
         var status = '';
-        if(result.headers)
+        if (result.headers)
             status = result.headers['x-m2m-rsc'];
 
         if (status === '2001') {
@@ -295,3 +310,4 @@ exports.init = init;
 exports.crt_ae = crt_ae;
 exports.crt_cnt = crt_cnt;
 exports.crt_cin = crt_cin;
+exports.del_rsc = del_rsc;

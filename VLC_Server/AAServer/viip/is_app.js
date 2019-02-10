@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const url = require('url');
 const crypto = require('crypto');
+const util = require('util');
 
 const conf = require('./is_conf.js');
 const comm = require('./comm_service');
@@ -38,26 +39,27 @@ exports.process_request = function (request, parent, body_Obj, ty) {
     // route Container
     var cnt_rsc_nm = url.parse(parent['ri']).pathname.split('/')[2];
     if (cnt_rsc_nm == 'cnt-Client-Message') {
-        sql.select_csr_poa(request.header.host, function (err, result) {
-            if (err == null) {
-                con.locationID = result.cb;
-                if (con.flag == 0) {
+        sql.select_csr_poa(request.headers.host, function (err, result) {
+            if (!err) {
+                con.locationID = result[0].cb;
+                if (con.type == 'ar') {
                     check_ar_msg(con);
-                } else {
+                } else if (con.type == 'vr') {
                     check_vr_msg(con);
                 }
             }
+            debug(`>>>poa:${util.inspect(request.headers.host)} | csr: ${JSON.stringify(result)} | cb:${result[0].cb}`);
         });
     } else if (cnt_rsc_nm == 'cnt-ExternalRequest') {
         if (con.type == 'start') {
-            var dup = 'x';
+            var dup = false;
             for(var i=0; i<active_service_table.length; i++) {
                 if(active_service_table[i].name == con.name) {
-                   dup = 'o';
+                   dup = true;
                    break;
                 }
             }
-            if(dup == 'x')
+            if(!dup)
                 startService(con);
         }
         else if (con.type == 'check')
@@ -100,7 +102,7 @@ const startService = (con) => {
             check_mapping_table();
 
             var wdt_id = idgen.generate();
-            wdt.set_wdt(wdt_id, 5, changeService, con.name, wdt_id);
+            wdt.set_wdt(wdt_id, 60, changeService, con.name, wdt_id);
             break;
         }
     }
@@ -114,7 +116,7 @@ const changeService = (wdt_id, name) => {
             debug(`>> Change Service[${active_service_table[i].name} : ${i}]`);
             active_service_table[i].state = 'late';
             check_mapping_table();
-            wdt.set_wdt(wdt_id, 5, stopService, name, wdt_id);
+            wdt.set_wdt(wdt_id, 60, stopService, name, wdt_id);
             break;
         }
     }
@@ -145,6 +147,11 @@ const check_mapping_table = () => {
     for (var i = 0; i < active_service_table.length; i++) {
         debug(`[${i}] name: ${active_service_table[i].name} | state: ${active_service_table[i].state}`);
     }
+
+    debug(`---- check cookie mapping table ----`)
+    for (var i = 0; i < cookie_mapping_table.length; i++) {
+        debug(`[${i}] code: ${cookie_mapping_table[i].code} | aid: ${cookie_mapping_table[i].aid} | cookie: ${cookie_mapping_table[i].cookie}`);
+    }
     debug(`---- check end ----`)
 };
 
@@ -174,12 +181,13 @@ const check_ar_msg = (con) => {
                         state: active_service_table[i].state
                     });
                     debug(`>> Make Cookie(${m_cookie}) for ${active_service_table[i].name} in ${con.locationID} || state : ${active_service_table[i].state}`);
-                    make_frame_msg(con.locationID, con.vtid, 2, m_cookie, con.attendeeID);
+                    make_frame_msg(con.locationID, con.vtID, 2, m_cookie, con.attendeeID);
                 }
                 else {
                     debug(`>> Not Found attendee's infomation`)
                 }
             });
+            break;
         }
     }
 }
