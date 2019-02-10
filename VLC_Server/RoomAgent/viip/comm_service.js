@@ -1,8 +1,8 @@
 var http = require('http');
 const Promise = require('bluebird');
 const shortid = require('shortid');
-const conf = require('./is_conf.js');
-const is_app = require('./is_app');
+const conf = require('./va_conf.js');
+const va_app = require('./va_app');
 const sql = require('../mobius/sql_action');
 
 var ae_count = 0;
@@ -14,8 +14,8 @@ var wdt_cntid = require('shortid').generate();
 var cin_count = 0;
 var wdt_cinid = require('shortid').generate();
 
-console.log = require('debug')('hidden:ps_ae');
-const debug = require('debug')('viip:ps_ae');
+console.log = require('debug')('hidden:va');
+const debug = require('debug')('viip:va_comm');
 
 // origin added
 const onem2m_http_request = (path, method, ty, bodyString, origin) => {
@@ -98,8 +98,6 @@ const recur_crt_ae_cnt = () => {
             crt_cnt(conf.ae[i].cnt[j], `/${conf.cse.name}/${conf.ae[i].name}`, conf.cse.id);
         }
     }
-    // register schedule
-    is_app.startRegister();
 };
 
 // make Conatainer requried to Server when initialized
