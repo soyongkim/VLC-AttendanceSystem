@@ -60,7 +60,7 @@ const send_vt = (path_arr, cinObj) => {
         debug('---- is not cin message');
     }
     else {  
-        if(cin.con['type'] == 0 && con.con['type'] == 1) {
+        if(cin.con['type'] == 0 || cin.con['type'] == 1) {
             if(cin.con['type'] == 0)
                 frmState = { code: 0, type: 'idle'};
             else 
@@ -78,7 +78,7 @@ const send_vt = (path_arr, cinObj) => {
  * @param {*} type : idle or active
  */
 const make_general_frame = (type) => {
-    debug(`>> Make General Frame[${frmState}]`);
+    debug(`>> Make General Frame[${frmState.state}]`);
     var frame = {};
     frame.vtid = conf.ae.name;
     frame.type = type;
@@ -96,10 +96,10 @@ const make_specific_frame = (con) => {
     debug(`>> Make Specific Frame for [${con.aid}]`);
     var frame = {};
     frame.vtid = conf.ae.name;
-    frame.type = type;
-    frame.cookie = (cin.con['cookie'] != "") ? cin.con['cookie'] : "00000000";
-    debug(`ascii test: aid[${cin.con['aid']} => ${ascii_to_hexa(cin.con['aid'])}`);
-    frame.aid = ascii_to_hexa(cin.con['aid']);
+    frame.type = con.type;
+    frame.cookie = (con['cookie'] != "") ? con['cookie'] : "00000000";
+    debug(`ascii test: aid[${con['aid']} => ${ascii_to_hexa(con['aid'])}`);
+    frame.aid = ascii_to_hexa(con['aid']);
     // require modification
     set_frame(frame).then(() => {
         make_general_frame(frmState.type);
@@ -161,7 +161,7 @@ function timer_upload_action() {
                 //var content = JSON.stringify({value: 'TAS' + t_count++});
                 //var content = '[state]' + parseInt(Math.random()*100).toString();
                 var content = {};
-                content.state = frmState;
+                content.state = frmState.type;
                 content.vtid = conf.ae.name;
                 debug(`HEARTBEAT Message Send [VT state]: ${content['state']} [VT ID]: ${content['vtid']} ---->`);
                 var parent = conf.cnt[j].parent + '/' + conf.cnt[j].name;
