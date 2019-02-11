@@ -72,7 +72,7 @@ class InitActivity : AppCompatActivity() {
     }
 
     fun onClick(view: View) {
-        HttpRequestService.cseBase = CSEBase(edit_ipAddress.text.toString(), "7579", "Mobius")
+        HttpRequestService.cseBase = CSEBase(edit_ipAddress.text.toString(), "7579", "IT5")
         dialog = SweetAlertDialog(this@InitActivity, SweetAlertDialog.FINGER_TYPE)
         dialog!!.titleText = "Search"
         dialog!!.contentText = "Searching for VLC-Manager..."

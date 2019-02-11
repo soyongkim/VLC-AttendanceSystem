@@ -195,12 +195,13 @@ const check_ar_msg = (con) => {
 const check_vr_msg = (con) => {
     for (var i = 0; i < cookie_mapping_table.length; i++) {
         if (con.cookie == cookie_mapping_table[i].cookie) {
-            sql.update_schedule_atd(code, cookie_mapping_table[i].code, cookie_mapping_table[i].aid, cookie_mapping_table[i].state, 'spec', function (err, res) {
+            sql.update_schedule_atd(cookie_mapping_table[i].code, cookie_mapping_table[i].aid, cookie_mapping_table[i].state, 'spec', function (err, res) {
                 if (!err) {
                     debug(`>> ${cookie_mapping_table[i].aid} complete attendance!`);
-                    make_frame_msg(con.locationID, con.vtid, 3, ``, con.aid);
+                    make_frame_msg(con.locationID, con.vtid, 3, ``, cookie_mapping_table[i].aid);
                     cookie_mapping_table.splice(i, 1);
                 }
+                debug(`>>> update result: ${JSON.stringify(res)}`);
             });
             break;
         }

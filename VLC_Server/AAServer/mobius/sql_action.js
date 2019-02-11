@@ -2185,7 +2185,7 @@ exports.select_all_atd = function(code, callback) {
 exports.update_schedule_atd = function(code, aid, state, req, callback) {
     var sql = '';
     if(req == `spec`)
-       sql = util.format(`update ${code} set state = \'${state}\' where aid = \'${aid}\'`);
+       sql = util.format(`update ${code} set state = \'${state}\' where atd_id = \'${aid}\'`);
     else if(req == 'rest')
        sql = util.format(`update ${code} set state = \'${state}\' where state = \'wait\'`);
     db.getResult(sql, '', function (err, results) {

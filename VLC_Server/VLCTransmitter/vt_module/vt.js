@@ -78,7 +78,7 @@ const send_vt = (path_arr, cinObj) => {
  * @param {*} type : idle or active
  */
 const make_general_frame = (type) => {
-    debug(`>> Make General Frame[${frmState.state}]`);
+    debug(`>> Make General Frame[${frmState.type}]`);
     var frame = {};
     frame.vtid = conf.ae.name;
     frame.type = type;
@@ -102,7 +102,9 @@ const make_specific_frame = (con) => {
     frame.aid = ascii_to_hexa(con['aid']);
     // require modification
     set_frame(frame).then(() => {
-        make_general_frame(frmState.type);
+        setTimeout(function() {
+            make_general_frame(frmState.type);
+        }, 500);
     });
 }
 

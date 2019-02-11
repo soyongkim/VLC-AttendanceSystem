@@ -53,7 +53,6 @@ class LoginDialog(context : Context?) : Dialog(context) {
             InitActivity.GET_SUCCESS -> handleSuccess()
             InitActivity.GET_FAIL -> handleFail()
         }
-
         return@Handler true
     }
 
@@ -63,7 +62,6 @@ class LoginDialog(context : Context?) : Dialog(context) {
         }
 
         mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.MOVE), 2000)
-
     }
 
     private fun handleFail() {

@@ -67,36 +67,16 @@ conf.ae[aecnt].id = `S${conf.ae[aecnt].name}`;
 conf.ae[aecnt].app_name = 'Attendance Schedule';
 conf.ae[aecnt].app_id = 'IT5';
 conf.ae[aecnt].cnt = [];
-// conf.ae[aecnt].cnt.push({
-//     parent: `/${conf.cse.name}/${conf.ae[aecnt].name}`,
-//     name: 'comp_724',
-//     locationID: `R529`,
-//     onRef: [
-//         `08:00`,
-//         `08:15`,
-//         `11:00`
-//     ]
-// });
-// conf.ae[aecnt].cnt.push({
-//     parent: `/${conf.cse.name}/${conf.ae[aecnt].name}`,
-//     name: 'itec_401',
-//     locationID: `R527`,
-//     onRef: [
-//         `08:00`,
-//         `08:15`,
-//         `11:00`
-//     ]
-// });
-// conf.ae[aecnt].cnt.push({
-//     parent: `/${conf.cse.name}/${conf.ae[aecnt].name}`,
-//     name: 'comp_402',
-//     locationID: `R314`,
-//     onRef: [
-//         `08:00`,
-//         `08:15`,
-//         `11:00`
-//     ]
-// });
+conf.ae[aecnt++].bodytype = 'json';
+
+// virtual student (for login)
+conf.ae[aecnt] = {};
+conf.ae[aecnt].parent = conf.cse.id;
+conf.ae[aecnt].name = 'std_2018220889';
+conf.ae[aecnt].id = `S${conf.ae[aecnt].name}`;
+conf.ae[aecnt].app_name = 'Soyong';
+conf.ae[aecnt].app_id = '2018220889';
+conf.ae[aecnt].cnt = [];
 conf.ae[aecnt++].bodytype = 'json';
 
 // Container

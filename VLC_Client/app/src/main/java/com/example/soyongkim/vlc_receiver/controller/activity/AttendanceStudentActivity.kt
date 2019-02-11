@@ -49,7 +49,9 @@ class AttendanceStudentActivity : AppCompatActivity() {
     internal var rcvdId = 1
     internal var rcvdType = 0
     private lateinit var rcvdData : ByteArray
-    internal var flag = 0
+    internal var flag = false
+
+    var preMsg = ""
 
     private val mExecutor = Executors.newCachedThreadPool()
     private var mSerialIoManager: SerialInputOutputManager? = null
@@ -60,18 +62,17 @@ class AttendanceStudentActivity : AppCompatActivity() {
         override fun onNewData(data: ByteArray) {
             this@AttendanceStudentActivity.runOnUiThread {
                 try {
-                    if(flag == 0) {
-                        flag = 1
+                    if(!flag) {
+                        //flag = true
                         rcvdId = TypeChangeUtil.byteToIntId(data)
                         rcvdType = TypeChangeUtil.byteToIntType(data)
                         rcvdData = TypeChangeUtil.byteToStringData(data)
-                        //updateReceivedData(data)
                         //Toast.makeText(this@AttendanceStudentActivity, HexDump.toHexString(rcvdData), Toast.LENGTH_LONG).show()
                         //For Debugging the VLC data
                         //Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()
-                        //updateReceivedData(data)
+                        updateReceivedData(data)
 
-                        processVLCdata()
+                        //processVLCdata()
                     }
 
                 } catch (e : Exception) {
@@ -83,7 +84,9 @@ class AttendanceStudentActivity : AppCompatActivity() {
 
     private fun updateReceivedData(data: ByteArray) {
         val message = "Read : " + data.size + " bytes :\n" + HexDump.toHexString(data) + "\n"
-        Toast.makeText(applicationContext, "Data:$message", Toast.LENGTH_LONG).show()
+        if(preMsg != message)
+            Toast.makeText(applicationContext, "$message", Toast.LENGTH_LONG).show()
+        preMsg = message
     }
 
     /* Response callback Interface */
@@ -101,7 +104,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
                 if(dialog != null) {
                     dialog!!.dismiss()
                     dialog = null
-                    flag = 0
+                    flag = false
                 }
             }
             AttendanceStudentActivity.SUCCESS -> handleSuccess()
