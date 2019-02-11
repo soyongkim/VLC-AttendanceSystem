@@ -27,7 +27,7 @@ global.mode = 'vt';
 conf.useprotocol = 'http'; // select one for 'http' or 'mqtt' or 'coap' or 'ws'
 
 // build cse
-cse.host        = '192.168.34.2';
+cse.host        = '192.168.34.4';
 cse.port        = '7599';
 cse.name        = 'R314';
 cse.id          = '/R314';

@@ -24,13 +24,15 @@ const update_table_timer = (con) => {
         if (con.vtid == vt_mapping_table[i].vt_rn) {
             wdt.del_wdt(i);
             wdt.set_wdt(i, 30, expire_table_timer, i);
-            debug(`>> update vt[${vt_mapping_table[i].vt_name}]'s info in table`);
+            vt_mapping_table[i].vt_state = con.state;
+            debug(`>> update vt[${vt_mapping_table[i].vt_name}] : state[${vt_mapping_table[i].vt_state}] in table`);
+
             check_vt_state_table();
             break;
         }
         else if (i == vt_mapping_table.length-1) {
             if(!con.vtid) {
-                mapping_vt_info(con.vtid);
+                register_vt_table(con.vtid);
             }
             else
                 debug(`>> Not Found vt[${vt_mapping_table[i].vt_name}]'s info in table | ${vt_mapping_table[i].vt_rn} =/= ${con.vtid}`);
@@ -38,11 +40,11 @@ const update_table_timer = (con) => {
     }
 
     if(first_register)
-        mapping_vt_info(con);
+        register_vt_table(con);
 };
 
-// if new vt is register, it is mapped in table
-const mapping_vt_info = (con) => {
+// 
+const register_vt_table = (con) => {
     debug(`>> vt_info : ${JSON.stringify(con)}`);
     vt_mapping_table[m_count] = {};
     vt_mapping_table[m_count].vt_rn = con.vtid;
@@ -97,13 +99,14 @@ exports.process_request = function (parent, body_Obj, ty) {
     }
 
     if (ae_rsc_nm == '*') {
-        for (var i = 0; i < m_count; i++) {
+        for (var i = 0; i < vt_mapping_table.length; i++) {
             noti_to_vt(`${vt_mapping_table[i].vt_name}/is_Message`, con, conf.cse.id);
         }
     } else if (ae_rsc_nm == 'specVT') {
-        for (var i = 0; i < m_count; i++) {
-            if (con.vtid == vt_mapping_table[i].vt_id) {
+        for (var i = 0; i < vt_mapping_table.length; i++) {
+            if (con.vtid == vt_mapping_table[i].vt_rn) {
                 debug(`>> Found matched name(${vt_mapping_table[i].vt_name}) to id(${con.vtid})`);
+                con.vtid = vt_mapping_table[i].vt_name;
                 if (con.type == 2)
                     process_verify_msg(con);
                 else

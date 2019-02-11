@@ -66,6 +66,7 @@ const make_frame = (path_arr, cinObj) => {
         frame.vtid = conf.ae.name;
         frame.type = cin.con['type'];
         frame.cookie = (cin.con['cookie'] != "") ? cin.con['cookie'] : "0000";
+        debug(`ascii test: aid[${cin.con['aid']} => ${ascii_to_hexa(cin.con['aid'])}`);
         frame.aid = (cin.con['aid'] != "") ? ascii_to_hexa(cin.con['aid']) : "0000000000";
         set_frame(frame);
 
@@ -74,7 +75,6 @@ const make_frame = (path_arr, cinObj) => {
         else 
             frmState = `active`;
 
-        debug(`ascii test : ${conf.ae.name} => ${frame.vtid}`);
     }
 }
 
