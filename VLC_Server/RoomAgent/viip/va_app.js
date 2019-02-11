@@ -43,7 +43,7 @@ const update_table_timer = (con) => {
         register_vt_table(con);
 };
 
-// 
+
 const register_vt_table = (con) => {
     debug(`>> vt_info : ${JSON.stringify(con)}`);
     vt_mapping_table[m_count] = {};
@@ -92,7 +92,7 @@ exports.process_request = function (parent, body_Obj, ty) {
     var con = body_Obj['cin']['con'];
     var ae_rsc_nm = url.parse(parent['ri']).pathname.split('/')[2];
     var hb_msg = url.parse(parent['ri']).pathname.split('/')[3];
-    debug(`>> hb_msg:${hb_msg}`);
+    //debug(`>> hb_msg:${hb_msg}`);
 
     if (hb_msg == 'vt_heartbeat') {
         update_table_timer(con);

@@ -213,7 +213,7 @@ exports.mqtt_noti_action = function(topic_arr, jsonObj) {
                             else {
                                 // Change to vt module from tas
                                 //tas.noti(path_arr, cinObj);
-                                vt.make_frame(path_arr, cinObj);
+                                vt.send_vt(path_arr, cinObj);
                             }
                             break;
                         }

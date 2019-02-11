@@ -5,7 +5,7 @@ let serialport = null;
 var ports = [];
 
 // frame state
-var frmState = `idle`;
+var frmState = { code: 0, type: 'idle'};
 
 // keep temporarily
 var serialnum = 0;
@@ -52,30 +52,58 @@ const init_serialport = () => {
 };
 
 
-const make_frame = (path_arr, cinObj) => {
+const send_vt = (path_arr, cinObj) => {
     var cin = {};
     cin.ctname = path_arr[path_arr.length-2];
     cin.con = (cinObj.con != null) ? cinObj.con : cinObj.content;
     if(cin.con == '') {
         debug('---- is not cin message');
     }
-    else {
-        // you can modify if you want to change the frame structure
-        debug('<---- send to VT Device');
-        var frame = {};
-        frame.vtid = conf.ae.name;
-        frame.type = cin.con['type'];
-        frame.cookie = (cin.con['cookie'] != "") ? cin.con['cookie'] : "0000";
-        debug(`ascii test: aid[${cin.con['aid']} => ${ascii_to_hexa(cin.con['aid'])}`);
-        frame.aid = (cin.con['aid'] != "") ? ascii_to_hexa(cin.con['aid']) : "0000000000";
-        set_frame(frame);
-
-        if(cin.con['type'] == 0)
-            frmState = `idle`;
-        else 
-            frmState = `active`;
-
+    else {  
+        if(cin.con['type'] == 0 && con.con['type'] == 1) {
+            if(cin.con['type'] == 0)
+                frmState = { code: 0, type: 'idle'};
+            else 
+                frmState = { code: 1, type: 'active'};
+            make_general_frame(cin.con['type']);
+        } else {
+            make_specific_frame(cin.con);
+        }
     }
+}
+
+/**
+ * make frame for general situation (idle or active)
+ *
+ * @param {*} type : idle or active
+ */
+const make_general_frame = (type) => {
+    debug(`>> Make General Frame[${frmState}]`);
+    var frame = {};
+    frame.vtid = conf.ae.name;
+    frame.type = type;
+    frame.cookie = "00000000";
+    frame.aid = "00000000000000000000";
+    set_frame(frame);
+}
+
+/**
+ * make frame for specific attendee (verify or result)
+ *
+ * @param {*} con : con.type(2,3), con.cookie, con.aid
+ */
+const make_specific_frame = (con) => {
+    debug(`>> Make Specific Frame for [${con.aid}]`);
+    var frame = {};
+    frame.vtid = conf.ae.name;
+    frame.type = type;
+    frame.cookie = (cin.con['cookie'] != "") ? cin.con['cookie'] : "00000000";
+    debug(`ascii test: aid[${cin.con['aid']} => ${ascii_to_hexa(cin.con['aid'])}`);
+    frame.aid = ascii_to_hexa(cin.con['aid']);
+    // require modification
+    set_frame(frame).then(() => {
+        make_general_frame(frmState.type);
+    });
 }
 
 
@@ -147,4 +175,4 @@ function timer_upload_action() {
 }
 
 exports.init = init;
-exports.make_frame = make_frame;
+exports.send_vt = send_vt;
