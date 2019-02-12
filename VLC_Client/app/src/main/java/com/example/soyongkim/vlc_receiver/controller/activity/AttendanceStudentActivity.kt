@@ -46,9 +46,11 @@ class AttendanceStudentActivity : AppCompatActivity() {
     private lateinit var sid : String
     private var dialog: ProgressDialog? = null
 
-    internal var rcvdId = 1
-    internal var rcvdType = 0
-    private lateinit var rcvdData : ByteArray
+    private lateinit var rcvdId : String
+    private lateinit var rcvdType : ByteArray
+    private lateinit var rcvdCookie : ByteArray
+    private lateinit var rcvdAid : ByteArray
+
     internal var flag = false
 
     var preMsg = ""
@@ -64,15 +66,18 @@ class AttendanceStudentActivity : AppCompatActivity() {
                 try {
                     if(!flag) {
                         //flag = true
-                        rcvdId = TypeChangeUtil.byteToIntId(data)
-                        rcvdType = TypeChangeUtil.byteToIntType(data)
-                        rcvdData = TypeChangeUtil.byteToStringData(data)
-                        //Toast.makeText(this@AttendanceStudentActivity, HexDump.toHexString(rcvdData), Toast.LENGTH_LONG).show()
+                        rcvdId = TypeChangeUtil.byteToId(data)
+                        rcvdType = TypeChangeUtil.byteToType(data)
+                        rcvdCookie = TypeChangeUtil.byteToCookie(data)
+                        rcvdAid = TypeChangeUtil.byteToStringData(data)
+
+                        Toast.makeText(this@AttendanceStudentActivity, "vtid:$rcvdId", Toast.LENGTH_LONG).show()
                         //For Debugging the VLC data
                         //Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()
+
                         updateReceivedData(data)
 
-                        //processVLCdata()
+                        processVLCdata()
                     }
 
                 } catch (e : Exception) {
@@ -145,7 +150,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
         HttpRequestService.getObject().httpRequestWithHandler(this@AttendanceStudentActivity, "POST",
-                "/cnt-ps-key", "<sid>${sid}</sid><key>${HexDump.toHexString(rcvdData)}</key>", 4,
+                "/cnt-Client-Message", "<sid>${sid}</sid><key>${HexDump.toHexString(rcvdCookie)}</key>", 4,
                 object : HttpResponseEventRouter {
                     override fun route(context: Context, code: Int, arg: String) {
                         runOnUiThread {
