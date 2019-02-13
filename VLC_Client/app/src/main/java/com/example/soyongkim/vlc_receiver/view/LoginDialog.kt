@@ -93,7 +93,8 @@ class LoginDialog(context : Context?) : Dialog(context) {
                                 mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.GET_SUCCESS), 1000)
                             }
                             else {
-                                mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.GET_FAIL), 1000)
+                                // for debuging, modified GET_FAlL to GET_SUCCESS
+                                mHandler.sendMessageDelayed(mHandler.obtainMessage(InitActivity.GET_SUCCESS), 1000)
                             }
                         }
                     })

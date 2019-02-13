@@ -171,17 +171,25 @@ const make_frame_msg = (va_location, vtid, type, cookie, aid) => {
 const check_ar_msg = (con) => {
     for (var i = 0; i < active_service_table.length; i++) {
         if (con.locationID == active_service_table[i].locationID) {
-            sql.select_schedule_atd(active_service_table[i].name, con.attendeeID, function (err, res) {
+            sql.select_schedule_atd(active_service_table[i].name, con.aid, function (err, res) {
+                debug(`>>>>> res test: ${JSON.stringify(res[0])}`);
                 if (!err) {
-                    var m_cookie = crypto.randomBytes(4).toString('hex').toUpperCase();
-                    cookie_mapping_table.push({
-                        code: active_service_table[i].name,
-                        aid: con.attendeeID,
-                        cookie: m_cookie,
-                        state: active_service_table[i].state
-                    });
-                    debug(`>> Make Cookie(${m_cookie}) for ${active_service_table[i].name} in ${con.locationID} || state : ${active_service_table[i].state}`);
-                    make_frame_msg(con.locationID, con.vtID, 2, m_cookie, con.attendeeID);
+                    if(res[0].state == 'wait') {
+                        var m_cookie = crypto.randomBytes(4).toString('hex').toUpperCase();
+                        cookie_mapping_table.push({
+                            code: active_service_table[i].name,
+                            aid: con.aid,
+                            cookie: m_cookie,
+                            state: active_service_table[i].state
+                        });
+                        debug(`>> Make Cookie(${m_cookie}) for ${active_service_table[i].name} in ${con.locationID} || state : ${active_service_table[i].state}`);
+                        make_frame_msg(con.locationID, con.vtid, 2, m_cookie, con.aid);
+                    }
+                    else {
+                        debug(`>> This attendee is already checked [state:${res[0].state}]`);
+                        var m_cookie = `11111111`
+                        make_frame_msg(con.locationID, con.vtid, 3, m_cookie, con.aid);
+                    }
                 }
                 else {
                     debug(`>> Not Found attendee's infomation`)

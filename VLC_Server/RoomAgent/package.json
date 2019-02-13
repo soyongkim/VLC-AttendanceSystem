@@ -35,7 +35,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "NODE_ENV=production DEBUG=viip:* node rosemary.js",
+    "start": "DEBUG=viip:* node rosemary.js",
     "start_dev": "NODE_ENV=development DEBUG=viip:* node rosemary.js"
   },
   "author": "Il Yeup Ahn, KETI",

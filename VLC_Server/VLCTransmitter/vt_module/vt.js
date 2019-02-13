@@ -47,6 +47,7 @@ const init_serialport = () => {
                 throw error;
             });
             ports[i] = serialport;
+            make_general_frame(0);
         }
     }
 };

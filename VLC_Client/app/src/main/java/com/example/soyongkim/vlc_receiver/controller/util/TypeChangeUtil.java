@@ -1,5 +1,6 @@
 package com.example.soyongkim.vlc_receiver.controller.util;
 
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 
 public class TypeChangeUtil {
@@ -14,19 +15,21 @@ public class TypeChangeUtil {
     public static String byteToId(byte[] src) {
         byte[] data = new byte[4];
         for(int i=0; i<4; i++) {
-            data[i] = src[i];
+            if(src[i] != 0)
+                data[i] = src[i];
         }
         String value = new String(data, Charset.forName("UTF-8"));
 
         return value;
     }
 
-    public static byte[] byteToType(byte[] src) {
+    public static int byteToType(byte[] src) {
         byte[] data = new byte[2];
         for(int i=4; i<6; i++) {
             data[i-4] = src[i];
         }
-        return data;
+
+        return new BigInteger(data).intValue();
     }
 
     public static byte[] byteToCookie(byte[] src) {
@@ -37,12 +40,13 @@ public class TypeChangeUtil {
         return data;
     }
 
-    public static byte[] byteToAid(byte[] src) {
+    public static String byteToAid(byte[] src) {
         byte[] data = new byte[10];
         for(int i=10; i<20; i++) {
             data[i-10] = src[i];
         }
-        return data;
+        String value = new String(data, Charset.forName("UTF-8"));
+        return value;
     }
 
     public static int byteToIntType(byte[] src) {
@@ -53,12 +57,12 @@ public class TypeChangeUtil {
         return ((s1 << 24) + (s2 << 16) + (s3 << 8) + (s4 << 0));
     }
 
-    public static byte[] byteToStringData(byte[] src) {
+    public static String byteToStringData(byte[] src) {
         byte[] data = new byte[16];
         for(int i=4; i<20; i++) {
             data[i-4] = src[i];
         }
-        //String value = new String(data, Charset.forName("UTF-8"));
-        return data;
+        String value = new String(data, Charset.forName("UTF-8"));
+        return value;
     }
 }

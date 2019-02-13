@@ -2169,7 +2169,8 @@ exports.insert_schedule_atd = function(code, value) {
 };
 
 exports.select_schedule_atd = function(code, aid, callback) {
-    var sql = util.format(`select * from ${code} where atd_id = \'%${aid}%\'`);
+    var sql = util.format(`select * from ${code} where atd_id = \'${aid}\'`);
+    //debug(`sql:${sql}`);
     db.getResult(sql, '', function (err, results) {
         callback(err, results);
     });

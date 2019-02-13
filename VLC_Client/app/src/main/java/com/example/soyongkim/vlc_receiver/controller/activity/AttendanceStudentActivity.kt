@@ -35,11 +35,16 @@ private var sPort: UsbSerialPort? = null
 class AttendanceStudentActivity : AppCompatActivity() {
 
     companion object {
-        const val MOVE = 0
-        const val SUCCESS = 1
-        const val ALREADY = 2
-        const val FAIL = 3
+        const val MOVE = 5
+        const val SUCCESS = 6
+        const val ALREADY = 7
+        const val FAIL = 8
+
+        const val INIT_STATE = 0
+        const val WAIT_SPEC_STATE = 1
     }
+
+    private var vrState : Int = INIT_STATE
 
     private lateinit var anim : Animation
     private lateinit var bAnim : AlphaAnimation
@@ -47,11 +52,11 @@ class AttendanceStudentActivity : AppCompatActivity() {
     private var dialog: ProgressDialog? = null
 
     private lateinit var rcvdId : String
-    private lateinit var rcvdType : ByteArray
+    private var rcvdType : Int = 0
     private lateinit var rcvdCookie : ByteArray
-    private lateinit var rcvdAid : ByteArray
+    private lateinit var rcvdAid : String
 
-    internal var flag = false
+    internal var rcvActivation = true
 
     var preMsg = ""
 
@@ -64,22 +69,26 @@ class AttendanceStudentActivity : AppCompatActivity() {
         override fun onNewData(data: ByteArray) {
             this@AttendanceStudentActivity.runOnUiThread {
                 try {
-                    if(!flag) {
-                        //flag = true
-                        rcvdId = TypeChangeUtil.byteToId(data)
-                        rcvdType = TypeChangeUtil.byteToType(data)
-                        rcvdCookie = TypeChangeUtil.byteToCookie(data)
-                        rcvdAid = TypeChangeUtil.byteToStringData(data)
 
-                        Toast.makeText(this@AttendanceStudentActivity, "vtid:$rcvdId", Toast.LENGTH_LONG).show()
-                        //For Debugging the VLC data
-                        //Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()
+                    rcvdId = TypeChangeUtil.byteToId(data)
+                    rcvdType = TypeChangeUtil.byteToType(data)
+                    rcvdCookie = TypeChangeUtil.byteToCookie(data)
+                    rcvdAid = TypeChangeUtil.byteToAid(data)
 
-                        updateReceivedData(data)
+                    Toast.makeText(this@AttendanceStudentActivity, "vtid($rcvdId) | type($rcvdType) | cookie(${HexDump.toHexString(rcvdCookie)}) | aid(${rcvdAid})", Toast.LENGTH_LONG).show()
+                    //For Debugging the VLC data
+                    //Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()
 
-                        processVLCdata()
+                    if(vrState == INIT_STATE) {
+                        if(rcvdType == 0)
+                            processVLCdata()
                     }
-
+                    else if(vrState == WAIT_SPEC_STATE) {
+                        if(rcvdType == 1 || rcvdType == 2) {
+                            if(rcvdAid == sid)
+                                processVLCdata()
+                        }
+                    }
                 } catch (e : Exception) {
                     Toast.makeText(this@AttendanceStudentActivity, "RcvError:$e",  Toast.LENGTH_LONG).show()
                 }
@@ -100,7 +109,37 @@ class AttendanceStudentActivity : AppCompatActivity() {
     }
 
     private fun processVLCdata() {
-        sendMessage()
+        when(rcvdType) {
+            1 -> {
+                Toast.makeText(applicationContext, "Received ACTIVE Frame", Toast.LENGTH_SHORT).show()
+                // 1. AR 메시지보내기
+                var arPayload = "<vtid>${rcvdId}</vtid><aid>${sid}</aid><type>ar</type>"
+                sendMessage(arPayload)
+                // 2. VERIFY 말고 모든 프레임 처리 막아두기. 중복 확인 체크를 위해 RESULT 프레임도 열어 둬야 겠다
+                vrState = WAIT_SPEC_STATE
+                // 3. 리시브 타이머 스타트
+
+            }
+            2 -> {
+                Toast.makeText(applicationContext, "Received VERIFY Frame", Toast.LENGTH_SHORT).show()
+                // 1. 내 VERIFY 인지 체크하기 -> 앞에서 했음
+                var vrPayload = "<vtid>${rcvdId}</vtid><cookie>${HexDump.toHexString(rcvdCookie)}</cookie><aid>${sid}</aid><type>vr</type>"
+                sendMessage(vrPayload)
+                // 2. 맞으면 VR 메시지 보내기 -> 즉 그냥 보내기만 하면 됨
+                // 3. RESULT 말고 모든 프레임 처리 막아두기 -> 이것도 하나의 스테이트가 되어 있어서 어차피 VERIFY 한번 보내고 나면 또 받아도 내껄로 받는게 아니니 앞에서 아이디 체크로 인해 걸러지기 때문에 이 작업은 필요없음
+            }
+            3 -> {
+                var checkDup = HexDump.toHexString(rcvdCookie);
+                if(checkDup == "11111111")
+                    Toast.makeText(applicationContext, "You already checked in this lecture", Toast.LENGTH_SHORT).show()
+                else
+                    Toast.makeText(applicationContext, "Attendance Checked", Toast.LENGTH_SHORT).show()
+                // 2. 맞으면 확인과 함께 액티비티 종료
+                finish()
+            }
+        }
+
+        //sendMessage()
     }
 
     private var mHandler = Handler() {
@@ -109,7 +148,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
                 if(dialog != null) {
                     dialog!!.dismiss()
                     dialog = null
-                    flag = false
+                    //rcvActivation = true
                 }
             }
             AttendanceStudentActivity.SUCCESS -> handleSuccess()
@@ -145,12 +184,12 @@ class AttendanceStudentActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendMessage() {
+    private fun sendMessage(payload: String) {
         dialog = ProgressDialog(this@AttendanceStudentActivity)
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
         HttpRequestService.getObject().httpRequestWithHandler(this@AttendanceStudentActivity, "POST",
-                "/cnt-Client-Message", "<sid>${sid}</sid><key>${HexDump.toHexString(rcvdCookie)}</key>", 4,
+                "/cnt-Client-Message", payload, 4,
                 object : HttpResponseEventRouter {
                     override fun route(context: Context, code: Int, arg: String) {
                         runOnUiThread {
@@ -178,14 +217,14 @@ class AttendanceStudentActivity : AppCompatActivity() {
                                 }
                                 Log.d("Student_code", "code:${code} arg:${arg} con:${con}")
                                 if(con == "fail") {
-                                    mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)
+                                    //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)
                                 } else if(con == "already_success"){
-                                    mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.ALREADY), 1000)
+                                    //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.ALREADY), 1000)
                                 } else {
-                                    mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS), 1000)
+                                    //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS), 1000)
                                 }
                             } else {
-                                mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)
+                                //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)
                             }
                         }
                     }
