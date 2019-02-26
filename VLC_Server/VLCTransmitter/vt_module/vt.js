@@ -99,13 +99,13 @@ const make_specific_frame = (con) => {
     frame.vtid = conf.ae.name;
     frame.type = con.type;
     frame.cookie = (con['cookie'] != "") ? con['cookie'] : "00000000";
-    debug(`ascii test: aid[${con['aid']} => ${ascii_to_hexa(con['aid'])}`);
+    //debug(`ascii test: aid[${con['aid']} => ${ascii_to_hexa(con['aid'])}]`);
     frame.aid = ascii_to_hexa(con['aid']);
     // require modification
     set_frame(frame).then(() => {
         setTimeout(function() {
-            make_general_frame(frmState.type);
-        }, 500);
+            make_general_frame(frmState.code);
+        }, 1000);
     });
 }
 

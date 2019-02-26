@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.soyongkim.vlc_receiver.R
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.example.soyongkim.vlc_receiver.controller.fragment.TabMainFragment
@@ -17,9 +18,19 @@ private lateinit var sPort: UsbSerialPort
 
 class SelectModeActivity : AppCompatActivity() {
 
+    private lateinit var btn_test: FloatingActionButton
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_mode)
+
+        btn_test = findViewById(R.id.fab_setting)
+        btn_test.setOnClickListener { v ->
+            val intent = Intent(this, TestActivity::class.java)
+            this.startActivity(intent)
+        }
+
     }
 
     override fun onResume() {

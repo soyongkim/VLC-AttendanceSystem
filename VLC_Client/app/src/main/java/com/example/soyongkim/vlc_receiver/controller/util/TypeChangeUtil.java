@@ -2,6 +2,8 @@ package com.example.soyongkim.vlc_receiver.controller.util;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TypeChangeUtil {
     public static int byteToIntId(byte[] src) {
@@ -19,8 +21,7 @@ public class TypeChangeUtil {
                 data[i] = src[i];
         }
         String value = new String(data, Charset.forName("UTF-8"));
-
-        return value;
+        return value.trim();
     }
 
     public static int byteToType(byte[] src) {

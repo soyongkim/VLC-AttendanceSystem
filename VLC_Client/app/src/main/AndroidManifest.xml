@@ -75,6 +75,7 @@
             android:screenOrientation="userPortrait"
             android:theme="@style/AppTheme" />
 
+
         <receiver
             android:name=".controller.receiver.TimerExpiredReceiver"
             android:enabled="true"

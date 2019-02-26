@@ -172,7 +172,7 @@ const check_ar_msg = (con) => {
     for (var i = 0; i < active_service_table.length; i++) {
         if (con.locationID == active_service_table[i].locationID) {
             sql.select_schedule_atd(active_service_table[i].name, con.aid, function (err, res) {
-                debug(`>>>>> res test: ${JSON.stringify(res[0])}`);
+                //debug(`>>>>> res test: ${JSON.stringify(res[0])}`);
                 if (!err) {
                     if(res[0].state == 'wait') {
                         var m_cookie = crypto.randomBytes(4).toString('hex').toUpperCase();
@@ -192,7 +192,7 @@ const check_ar_msg = (con) => {
                     }
                 }
                 else {
-                    debug(`>> Not Found attendee's infomation`)
+                    debug(`>> Not Found attendee's infomation`);
                 }
             });
             break;

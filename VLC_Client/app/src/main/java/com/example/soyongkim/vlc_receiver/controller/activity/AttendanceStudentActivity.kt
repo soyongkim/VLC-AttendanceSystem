@@ -35,13 +35,19 @@ private var sPort: UsbSerialPort? = null
 class AttendanceStudentActivity : AppCompatActivity() {
 
     companion object {
-        const val MOVE = 5
-        const val SUCCESS = 6
-        const val ALREADY = 7
-        const val FAIL = 8
+        const val MOVE = 7
+        const val SUCCESS = 8
+        const val FAIL = 9
 
-        const val INIT_STATE = 0
-        const val WAIT_SPEC_STATE = 1
+        // VR state
+        const val INIT_STATE = 5
+        const val WAIT_SPEC_STATE = 6
+
+        // VLC Frame Type
+        const val IDLE = 0
+        const val ACTIVE = 1
+        const val VERIFY = 2
+        const val RESULT = 3
     }
 
     private var vrState : Int = INIT_STATE
@@ -58,8 +64,6 @@ class AttendanceStudentActivity : AppCompatActivity() {
 
     internal var rcvActivation = true
 
-    var preMsg = ""
-
     private val mExecutor = Executors.newCachedThreadPool()
     private var mSerialIoManager: SerialInputOutputManager? = null
 
@@ -69,23 +73,22 @@ class AttendanceStudentActivity : AppCompatActivity() {
         override fun onNewData(data: ByteArray) {
             this@AttendanceStudentActivity.runOnUiThread {
                 try {
-
                     rcvdId = TypeChangeUtil.byteToId(data)
                     rcvdType = TypeChangeUtil.byteToType(data)
                     rcvdCookie = TypeChangeUtil.byteToCookie(data)
                     rcvdAid = TypeChangeUtil.byteToAid(data)
 
-                    Toast.makeText(this@AttendanceStudentActivity, "vtid($rcvdId) | type($rcvdType) | cookie(${HexDump.toHexString(rcvdCookie)}) | aid(${rcvdAid})", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this@AttendanceStudentActivity, "vtid($rcvdId) - vtidLength(${rcvdId.length})| type($rcvdType) | cookie(${HexDump.toHexString(rcvdCookie)}) | aid(${rcvdAid})", Toast.LENGTH_LONG).show()
                     //For Debugging the VLC data
                     //Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()
 
                     if(vrState == INIT_STATE) {
-                        if(rcvdType == 0)
+                        if(rcvdType == ACTIVE)
                             processVLCdata()
                     }
                     else if(vrState == WAIT_SPEC_STATE) {
-                        if(rcvdType == 1 || rcvdType == 2) {
-                            if(rcvdAid == sid)
+                        if(rcvdType == VERIFY || rcvdType == RESULT) {
+                            if(rcvdAid == sid) 
                                 processVLCdata()
                         }
                     }
@@ -96,12 +99,6 @@ class AttendanceStudentActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateReceivedData(data: ByteArray) {
-        val message = "Read : " + data.size + " bytes :\n" + HexDump.toHexString(data) + "\n"
-        if(preMsg != message)
-            Toast.makeText(applicationContext, "$message", Toast.LENGTH_LONG).show()
-        preMsg = message
-    }
 
     /* Response callback Interface */
     interface IReceived {
@@ -110,36 +107,31 @@ class AttendanceStudentActivity : AppCompatActivity() {
 
     private fun processVLCdata() {
         when(rcvdType) {
-            1 -> {
+            ACTIVE -> {
                 Toast.makeText(applicationContext, "Received ACTIVE Frame", Toast.LENGTH_SHORT).show()
-                // 1. AR 메시지보내기
-                var arPayload = "<vtid>${rcvdId}</vtid><aid>${sid}</aid><type>ar</type>"
-                sendMessage(arPayload)
-                // 2. VERIFY 말고 모든 프레임 처리 막아두기. 중복 확인 체크를 위해 RESULT 프레임도 열어 둬야 겠다
+                var type = "ar"
+                var arPayload = "<vtid>${rcvdId}</vtid><aid>${sid}</aid><type>${type}</type>"
+                sendMessage(arPayload, type)
                 vrState = WAIT_SPEC_STATE
-                // 3. 리시브 타이머 스타트
 
             }
-            2 -> {
+            VERIFY -> {
                 Toast.makeText(applicationContext, "Received VERIFY Frame", Toast.LENGTH_SHORT).show()
-                // 1. 내 VERIFY 인지 체크하기 -> 앞에서 했음
-                var vrPayload = "<vtid>${rcvdId}</vtid><cookie>${HexDump.toHexString(rcvdCookie)}</cookie><aid>${sid}</aid><type>vr</type>"
-                sendMessage(vrPayload)
-                // 2. 맞으면 VR 메시지 보내기 -> 즉 그냥 보내기만 하면 됨
-                // 3. RESULT 말고 모든 프레임 처리 막아두기 -> 이것도 하나의 스테이트가 되어 있어서 어차피 VERIFY 한번 보내고 나면 또 받아도 내껄로 받는게 아니니 앞에서 아이디 체크로 인해 걸러지기 때문에 이 작업은 필요없음
+                var type = "vr"
+                var vrPayload = "<vtid>${rcvdId}</vtid><cookie>${HexDump.toHexString(rcvdCookie)}</cookie><aid>${sid}</aid><type>${type}</type>"
+                sendMessage(vrPayload, type)
             }
-            3 -> {
+            RESULT -> {
                 var checkDup = HexDump.toHexString(rcvdCookie);
-                if(checkDup == "11111111")
+                if(checkDup == "11111111") {
                     Toast.makeText(applicationContext, "You already checked in this lecture", Toast.LENGTH_SHORT).show()
-                else
-                    Toast.makeText(applicationContext, "Attendance Checked", Toast.LENGTH_SHORT).show()
-                // 2. 맞으면 확인과 함께 액티비티 종료
-                finish()
+                    mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)
+                }
+                else {
+                    mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS), 1000)
+                }
             }
         }
-
-        //sendMessage()
     }
 
     private var mHandler = Handler() {
@@ -149,45 +141,68 @@ class AttendanceStudentActivity : AppCompatActivity() {
                     dialog!!.dismiss()
                     dialog = null
                     //rcvActivation = true
+                    finish()
                 }
             }
             AttendanceStudentActivity.SUCCESS -> handleSuccess()
-            AttendanceStudentActivity.ALREADY -> handleFail("already")
-            AttendanceStudentActivity.FAIL -> handleFail("fail")
+            AttendanceStudentActivity.FAIL -> handleFail()
         }
-
         return@Handler true
     }
 
     private fun handleSuccess() {
         if (dialog != null && dialog!!.isShowing) {
             dialog!!.changeAlertType(ProgressDialog.SUCCESS_TYPE)
-        }
-        Timer().schedule(object : TimerTask(){
-            override fun run() {
-                this@AttendanceStudentActivity.run {
-                    finish()
-                }
-            }
-        } , 2000)
-    }
-
-    private fun handleFail(res: String) {
-        if(res == "fail")
-            Toast.makeText(this@AttendanceStudentActivity, "It's not available key", Toast.LENGTH_SHORT).show()
-        else if(res == "already") {
-            Toast.makeText(this@AttendanceStudentActivity, "You are already checked", Toast.LENGTH_SHORT).show()
-            finish()
-        }
-        if (dialog != null && dialog!!.isShowing) {
+            Toast.makeText(this@AttendanceStudentActivity, "Success to check Attendance", Toast.LENGTH_SHORT).show()
             mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.MOVE))
         }
+//        Timer().schedule(object : TimerTask(){
+//            override fun run() {
+//                this@AttendanceStudentActivity.run {
+//                    Toast.makeText(this@AttendanceStudentActivity, "It's not available key", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        } , 2000)
     }
 
-    private fun sendMessage(payload: String) {
+    private fun handleFail() {
+        if (dialog != null && dialog!!.isShowing) {
+            dialog!!.changeAlertType(ProgressDialog.ERROR_TYPE)
+            mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.MOVE))
+
+        }
+    }
+
+    private fun showDialog() {
         dialog = ProgressDialog(this@AttendanceStudentActivity)
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
+
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                    dialog!!.show()
+                    startTimer()
+                }
+            }
+        }, 200)
+    }
+
+    private fun startTimer() {
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                    Toast.makeText(this@AttendanceStudentActivity, "Time out!", Toast.LENGTH_SHORT).show()
+                    mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.FAIL))
+                }
+            }
+        }, 10000)
+    }
+
+    private fun sendMessage(payload: String, type: String) {
+        if(type == "ar") {
+            showDialog()
+        }
         HttpRequestService.getObject().httpRequestWithHandler(this@AttendanceStudentActivity, "POST",
                 "/cnt-Client-Message", payload, 4,
                 object : HttpResponseEventRouter {
@@ -215,28 +230,13 @@ class AttendanceStudentActivity : AppCompatActivity() {
                                     }
                                     eventType = parser.next()
                                 }
-                                Log.d("Student_code", "code:${code} arg:${arg} con:${con}")
-                                if(con == "fail") {
-                                    //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)
-                                } else if(con == "already_success"){
-                                    //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.ALREADY), 1000)
-                                } else {
-                                    //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS), 1000)
-                                }
+                                //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS), 1000)
                             } else {
                                 //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)
                             }
                         }
                     }
                 })
-
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                runOnUiThread {
-                    dialog!!.show()
-                }
-            }
-        }, 200)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
