@@ -28,6 +28,7 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import org.xmlpull.v1.XmlPullParser
 import java.io.IOException
 import java.io.StringReader
+import java.sql.Time
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -62,10 +63,13 @@ class AttendanceStudentActivity : AppCompatActivity() {
     private lateinit var rcvdCookie : ByteArray
     private lateinit var rcvdAid : String
 
-    internal var rcvActivation = true
+    private lateinit var bData : ByteArray
+    internal var chkDupFrm = false
 
     private val mExecutor = Executors.newCachedThreadPool()
     private var mSerialIoManager: SerialInputOutputManager? = null
+
+    private lateinit var receiveTimer: TimerTask
 
     private val mListener = object : SerialInputOutputManager.Listener {
         override fun onRunError(e: Exception) {}
@@ -73,6 +77,8 @@ class AttendanceStudentActivity : AppCompatActivity() {
         override fun onNewData(data: ByteArray) {
             this@AttendanceStudentActivity.runOnUiThread {
                 try {
+                    //bData = data
+
                     rcvdId = TypeChangeUtil.byteToId(data)
                     rcvdType = TypeChangeUtil.byteToType(data)
                     rcvdCookie = TypeChangeUtil.byteToCookie(data)
@@ -88,8 +94,9 @@ class AttendanceStudentActivity : AppCompatActivity() {
                     }
                     else if(vrState == WAIT_SPEC_STATE) {
                         if(rcvdType == VERIFY || rcvdType == RESULT) {
-                            if(rcvdAid == sid) 
+                            if(rcvdAid == sid && chkDupFrm == false) {
                                 processVLCdata()
+                            }
                         }
                     }
                 } catch (e : Exception) {
@@ -99,6 +106,17 @@ class AttendanceStudentActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkDupFrame(data : ByteArray) {
+        if(bData != data) {
+            chkDupFrm = false
+        }
+        else {
+            Toast.makeText(this@AttendanceStudentActivity, "Dup Frame:$bData",  Toast.LENGTH_SHORT).show()
+            chkDupFrm = true
+        }
+
+        bData = data
+    }
 
     /* Response callback Interface */
     interface IReceived {
@@ -122,13 +140,14 @@ class AttendanceStudentActivity : AppCompatActivity() {
                 sendMessage(vrPayload, type)
             }
             RESULT -> {
+                Toast.makeText(applicationContext, "Received RESULT Frame", Toast.LENGTH_SHORT).show()
                 var checkDup = HexDump.toHexString(rcvdCookie);
                 if(checkDup == "11111111") {
                     Toast.makeText(applicationContext, "You already checked in this lecture", Toast.LENGTH_SHORT).show()
-                    mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)
+                    mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.FAIL))
                 }
                 else {
-                    mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS), 1000)
+                    mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS))
                 }
             }
         }
@@ -140,7 +159,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
                 if(dialog != null) {
                     dialog!!.dismiss()
                     dialog = null
-                    //rcvActivation = true
+                    receiveTimer.cancel()
                     finish()
                 }
             }
@@ -154,7 +173,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
         if (dialog != null && dialog!!.isShowing) {
             dialog!!.changeAlertType(ProgressDialog.SUCCESS_TYPE)
             Toast.makeText(this@AttendanceStudentActivity, "Success to check Attendance", Toast.LENGTH_SHORT).show()
-            mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.MOVE))
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.MOVE), 2000)
         }
 //        Timer().schedule(object : TimerTask(){
 //            override fun run() {
@@ -167,9 +186,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
 
     private fun handleFail() {
         if (dialog != null && dialog!!.isShowing) {
-            dialog!!.changeAlertType(ProgressDialog.ERROR_TYPE)
             mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.MOVE))
-
         }
     }
 
@@ -189,14 +206,15 @@ class AttendanceStudentActivity : AppCompatActivity() {
     }
 
     private fun startTimer() {
-        Timer().schedule(object : TimerTask() {
+        receiveTimer = object : TimerTask() {
             override fun run() {
                 runOnUiThread {
                     Toast.makeText(this@AttendanceStudentActivity, "Time out!", Toast.LENGTH_SHORT).show()
                     mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.FAIL))
                 }
             }
-        }, 10000)
+        }
+        Timer().schedule(receiveTimer, 10000)
     }
 
     private fun sendMessage(payload: String, type: String) {

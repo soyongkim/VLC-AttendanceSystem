@@ -79,7 +79,7 @@ const send_vt = (path_arr, cinObj) => {
  * @param {*} type : idle or active
  */
 const make_general_frame = (type) => {
-    debug(`>> Make General Frame[${frmState.type}]`);
+    debug(`>> Make General Frame [${frmState.type}]`);
     var frame = {};
     frame.vtid = conf.ae.name;
     frame.type = type;
@@ -94,7 +94,10 @@ const make_general_frame = (type) => {
  * @param {*} con : con.type(2,3), con.cookie, con.aid
  */
 const make_specific_frame = (con) => {
-    debug(`>> Make Specific Frame for [${con.aid}]`);
+    if(con.type == 2)
+        debug(`>> Make Specific Frame [VERIFY] for (${con.aid})`);
+    else
+        debug(`>> Make Specific Frame [RESULT] for (${con.aid})`);
     var frame = {};
     frame.vtid = conf.ae.name;
     frame.type = con.type;
@@ -154,7 +157,7 @@ const ascii_to_hexa = (str) => {
 		arr1.push(hex);
 	 }
 	return arr1.join('');
-   }
+}
 
 // hb send 
 function timer_upload_action() {
