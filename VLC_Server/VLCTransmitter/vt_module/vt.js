@@ -84,7 +84,8 @@ const make_general_frame = (type) => {
     frame.vtid = conf.ae.name;
     frame.type = type;
     frame.cookie = "00000000";
-    frame.aid = "00000000000000000000";
+    frame.aid = "000000000000000000";
+    frame.state = 0;
     set_frame(frame);
 }
 
@@ -102,8 +103,8 @@ const make_specific_frame = (con) => {
     frame.vtid = conf.ae.name;
     frame.type = con.type;
     frame.cookie = (con['cookie'] != "") ? con['cookie'] : "00000000";
-    //debug(`ascii test: aid[${con['aid']} => ${ascii_to_hexa(con['aid'])}]`);
     frame.aid = ascii_to_hexa(con['aid']);
+    frame.state = con.state;
     // require modification
     set_frame(frame).then(() => {
         setTimeout(function() {
@@ -117,20 +118,23 @@ const set_frame = (frame) => {
     return new Promise((resolve, reject) => {
         for(var i=0; i<conf.serial.length; i++) {
             if(conf.serial[i].enabled == true && conf.serial[i].id == `/${frame.vtid}`) {
-                debug(`Set [ vtid(${frame.vtid}) | type(${frame.type}) | cookie(${frame.cookie}) | aid(${frame.aid}) ]`);
+                debug(`Set [ vtid(${frame.vtid}) | type(${frame.type}) | cookie(${frame.cookie}) | aid(${frame.aid}) | state(${frame.state})]`);
                 
                 // vtid (4bytes)
                 serialPortBuffer.write(ascii_to_hexa(frame.vtid), 0, 4, 'hex');
 
-                // type (2bytes)
+                // type (1bytes)
                 //serialPortBuffer.write(frame.type, 4, 6, 'hex');
-                serialPortBuffer.writeInt16BE(frame.type, 4, true);
+                serialPortBuffer.writeInt8(frame.type, 4, true);
 
                 // cookie id or ateendee mapping id (4bytes) 
-                serialPortBuffer.write(frame.cookie, 6, 10, 'hex');
+                serialPortBuffer.write(frame.cookie, 5, 9, 'hex');
 
                 // attendee id (10bytes)
-                serialPortBuffer.write(frame.aid, 10, 20, 'hex');
+                serialPortBuffer.write(frame.aid, 9, 19, 'hex');
+
+                // state (1bytes)
+                serialPortBuffer.writeInt8(frame.state, 19, true);
 
                 debug(`Write to serialPort (${serialPortBuffer.toString('hex')})`);
             

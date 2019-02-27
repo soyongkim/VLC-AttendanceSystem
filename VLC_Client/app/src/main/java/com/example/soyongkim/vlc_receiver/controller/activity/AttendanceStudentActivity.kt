@@ -62,6 +62,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
     private var rcvdType : Int = 0
     private lateinit var rcvdCookie : ByteArray
     private lateinit var rcvdAid : String
+    private var rcvdState : Int = 0
 
     private lateinit var bData : ByteArray
     internal var chkDupFrm = false
@@ -83,6 +84,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
                     rcvdType = TypeChangeUtil.byteToType(data)
                     rcvdCookie = TypeChangeUtil.byteToCookie(data)
                     rcvdAid = TypeChangeUtil.byteToAid(data)
+                    rcvdState = TypeChangeUtil.byteToState(data)
 
                     //Toast.makeText(this@AttendanceStudentActivity, "vtid($rcvdId) - vtidLength(${rcvdId.length})| type($rcvdType) | cookie(${HexDump.toHexString(rcvdCookie)}) | aid(${rcvdAid})", Toast.LENGTH_LONG).show()
                     //For Debugging the VLC data
@@ -141,13 +143,19 @@ class AttendanceStudentActivity : AppCompatActivity() {
             }
             RESULT -> {
                 Toast.makeText(applicationContext, "Received RESULT Frame", Toast.LENGTH_SHORT).show()
-                var checkDup = HexDump.toHexString(rcvdCookie);
-                if(checkDup == "11111111") {
-                    Toast.makeText(applicationContext, "You already checked in this lecture", Toast.LENGTH_SHORT).show()
-                    mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.FAIL))
-                }
-                else {
-                    mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS))
+                when(rcvdState) {
+                    0 -> {
+                        Toast.makeText(applicationContext, "Approval", Toast.LENGTH_SHORT).show()
+                        mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS))
+                    }
+                    1 -> {
+                        Toast.makeText(applicationContext, "Late", Toast.LENGTH_SHORT).show()
+                        mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS))
+                    }
+                    2 -> {
+                        Toast.makeText(applicationContext, "You already checked in this lecture", Toast.LENGTH_SHORT).show()
+                        mHandler.sendMessage(mHandler.obtainMessage(AttendanceStudentActivity.FAIL))
+                    }
                 }
             }
         }
@@ -172,16 +180,8 @@ class AttendanceStudentActivity : AppCompatActivity() {
     private fun handleSuccess() {
         if (dialog != null && dialog!!.isShowing) {
             dialog!!.changeAlertType(ProgressDialog.SUCCESS_TYPE)
-            Toast.makeText(this@AttendanceStudentActivity, "Success to check Attendance", Toast.LENGTH_SHORT).show()
             mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.MOVE), 2000)
         }
-//        Timer().schedule(object : TimerTask(){
-//            override fun run() {
-//                this@AttendanceStudentActivity.run {
-//                    Toast.makeText(this@AttendanceStudentActivity, "It's not available key", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        } , 2000)
     }
 
     private fun handleFail() {

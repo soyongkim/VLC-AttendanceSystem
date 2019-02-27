@@ -98,7 +98,7 @@ const startService = (con) => {
                 time: conf.schedule[i].time,
                 state: 'approval'
             });
-            make_frame_msg(conf.schedule[i].locationID, `*`, 1, ``, ``);
+            make_frame_msg(conf.schedule[i].locationID, `*`, 1, ``, ``, 0);
             check_mapping_table();
 
             var wdt_id = idgen.generate();
@@ -129,7 +129,7 @@ const stopService = (wdt_id, name) => {
         if(name == active_service_table[i].name) {
             sql.update_schedule_atd(active_service_table[i].name, '', 'x', 'rest', function (err, res) {
                 if (!err) {
-                    make_frame_msg(active_service_table[i].locationID, `*`, 0, ``, ``);
+                    make_frame_msg(active_service_table[i].locationID, `*`, 0, ``, ``, 0);
                     debug(`>> Stop Service[${active_service_table[i].name}]`);
                     active_service_table.splice(i, 1);
                 } else {
@@ -155,11 +155,12 @@ const check_mapping_table = () => {
     debug(`---- check end ----`)
 };
 
-const make_frame_msg = (va_location, vtid, type, cookie, aid) => {
+const make_frame_msg = (va_location, vtid, type, cookie, aid, state) => {
     var contents = {};
     contents.type = type;
     contents.cookie = cookie;
     contents.aid = aid;
+    contents.state = state
     if (vtid == '*')
         comm.crt_cin(`/${va_location}/*`, contents, conf.cse.id);
     else {
@@ -183,12 +184,12 @@ const check_ar_msg = (con) => {
                             state: active_service_table[i].state
                         });
                         debug(`>> Make Cookie(${m_cookie}) for ${active_service_table[i].name} in ${con.locationID} || state : ${active_service_table[i].state}`);
-                        make_frame_msg(con.locationID, con.vtid, 2, m_cookie, con.aid);
+                        make_frame_msg(con.locationID, con.vtid, 2, m_cookie, con.aid, 0);
                     }
                     else {
                         debug(`>> This attendee is already checked [state:${res[0].state}]`);
                         var m_cookie = `11111111`
-                        make_frame_msg(con.locationID, con.vtid, 3, m_cookie, con.aid);
+                        make_frame_msg(con.locationID, con.vtid, 3, m_cookie, con.aid, 2);
                     }
                 }
                 else {
@@ -206,7 +207,10 @@ const check_vr_msg = (con) => {
             sql.update_schedule_atd(cookie_mapping_table[i].code, cookie_mapping_table[i].aid, cookie_mapping_table[i].state, 'spec', function (err, res) {
                 if (!err) {
                     debug(`>> ${cookie_mapping_table[i].aid} complete attendance!`);
-                    make_frame_msg(con.locationID, con.vtid, 3, ``, cookie_mapping_table[i].aid);
+                    if(cookie_mapping_table[i].state == 'approval')
+                        make_frame_msg(con.locationID, con.vtid, 3, ``, cookie_mapping_table[i].aid, 0);
+                    else
+                        make_frame_msg(con.locationID, con.vtid, 3, ``, cookie_mapping_table[i].aid, 1);
                     cookie_mapping_table.splice(i, 1);
                 }
                 debug(`>>> update result: ${JSON.stringify(res)}`);

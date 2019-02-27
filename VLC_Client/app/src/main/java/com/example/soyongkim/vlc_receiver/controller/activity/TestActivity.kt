@@ -39,6 +39,7 @@ class TestActivity : AppCompatActivity() {
     private var rcvdType : Int = 0
     private lateinit var rcvdCookie : ByteArray
     private lateinit var rcvdAid : String
+    private var rcvdState : Int = 0
 
     private val mExecutor = Executors.newCachedThreadPool()
     private var mSerialIoManager: SerialInputOutputManager? = null
@@ -57,6 +58,7 @@ class TestActivity : AppCompatActivity() {
                     rcvdType = TypeChangeUtil.byteToType(data)
                     rcvdCookie = TypeChangeUtil.byteToCookie(data)
                     rcvdAid = TypeChangeUtil.byteToAid(data)
+                    rcvdState = TypeChangeUtil.byteToState(data)
 
                     updateReceivedData(data)
 
@@ -70,7 +72,7 @@ class TestActivity : AppCompatActivity() {
     private fun updateReceivedData(data: ByteArray) {
         var message = "Read : " + data.size + " bytes \n" + HexDump.toHexString(data) + "\n"
         // if you want to see formal data, use it
-        message += "vtid($rcvdId) | type($rcvdType) | cookie(${HexDump.toHexString(rcvdCookie)}) | aid(${rcvdAid})\n"
+        message += "vtid($rcvdId) | type($rcvdType) | cookie(${HexDump.toHexString(rcvdCookie)}) | aid(${rcvdAid}) | state(${rcvdState})\n"
         mDumpTextView.append(message)
         mScrollView.smoothScrollTo(0, mDumpTextView.bottom)
     }

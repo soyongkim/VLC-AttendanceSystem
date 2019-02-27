@@ -25,29 +25,32 @@ public class TypeChangeUtil {
     }
 
     public static int byteToType(byte[] src) {
-        byte[] data = new byte[2];
-        for(int i=4; i<6; i++) {
-            data[i-4] = src[i];
-        }
-
+        byte[] data = new byte[1];
+        data[0] = src[4];
         return new BigInteger(data).intValue();
     }
 
     public static byte[] byteToCookie(byte[] src) {
         byte[] data = new byte[4];
-        for(int i=6; i<10; i++) {
-            data[i-6] = src[i];
+        for(int i=5; i<9; i++) {
+            data[i-5] = src[i];
         }
         return data;
     }
 
     public static String byteToAid(byte[] src) {
         byte[] data = new byte[10];
-        for(int i=10; i<20; i++) {
-            data[i-10] = src[i];
+        for(int i=9; i<19; i++) {
+            data[i-9] = src[i];
         }
         String value = new String(data, Charset.forName("UTF-8"));
         return value;
+    }
+
+    public static int byteToState(byte[] src) {
+        byte[] data = new byte[1];
+        data[0] = src[20];
+        return new BigInteger(data).intValue();
     }
 
     public static int byteToIntType(byte[] src) {
