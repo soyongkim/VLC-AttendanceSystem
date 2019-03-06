@@ -397,3 +397,4 @@ exports.crt_ae = crt_ae;
 exports.crt_cnt = crt_cnt;
 exports.crt_cin = crt_cin;
 exports.del_rsc = del_rsc;
+exports.onem2m_coap_request = onem2m_coap_request;

@@ -3006,10 +3006,17 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
 }
 
 function forward_coap(forwardcbhost, request) {
-    debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} length: ${request.body.length}`);
-    va_com.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, 'SIT5').then((result) => {
-        debug('-- Done forwarding coap');
-    });
+    var method = request.method.toLowerCase()
+    debug(`forward body: ${request.body} method: ${method} length: ${request.body.length}`);
+    if(method == 'get') {
+        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '', '', 'SIT5').then((result) => {
+            debug('-- Done forwarding coap(get)');
+        });
+    } else {
+        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '4', request.body, 'SIT5').then((result) => {
+            debug('-- Done forwarding coap(post)');
+        });  
+    }
 }
 
 
