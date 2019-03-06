@@ -74,10 +74,10 @@ const onem2m_http_request = (path, method, ty, bodyString, origin) => {
     });
 };
 
-const onem2m_coap_request = (path, method, ty, bodyString, origin) => {
+const onem2m_coap_request = (host, path, method, ty, bodyString, origin) => {
     return new Promise((resolve, reject) => {
     var options = {
-        host: conf.cse.host,
+        host: host,
         port: 5683,
         pathname: path,
         method: method,
@@ -358,7 +358,7 @@ const crt_cin = (cnt, content, origin) => {
     bodyString = JSON.stringify(results_ci);
 
     // change http to coap
-    onem2m_coap_request(cnt, 'post', '4', bodyString, origin).then((result) => {
+    onem2m_coap_request(conf.cse.host, cnt, 'post', '4', bodyString, origin).then((result) => {
         var status = '';
         if (result.headers)
             status = result.headers['x-m2m-rsc'];

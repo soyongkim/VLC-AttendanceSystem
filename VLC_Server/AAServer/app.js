@@ -52,6 +52,7 @@ var sgn = require('./mobius/sgn');
 var db = require('./mobius/db_action');
 var db_sql = require('./mobius/sql_action');
 var is_app = require('./viip/is_app');
+var is_comm = require('./viip/comm_service');
 
 
 console.log = require('debug')('viip:log');
@@ -2880,8 +2881,9 @@ function check_csr(absolute_url, request, response) {
                         point.forwardcbport = poa.port;
 
                         console.log('csebase forwarding to ' + point.forwardcbname);
-
-                        forward_http(point.forwardcbhost, point.forwardcbport, request, response);
+                        // check forwarding
+                        forward_coap(point.forwardcbhost, request);
+                        //forward_http(point.forwardcbhost, point.forwardcbport, request, response);
                     }
                     else if (poa.protocol == 'mqtt:') {
                         point.forwardcbmqtt = poa.hostname;
@@ -2957,7 +2959,7 @@ function notify_http(hostname, port, path, request, response) {
     });
 
     console.log(request.method + ' - ' + path);
-//    console.log(request.headers);
+    //console.log(request.headers);
     console.log(request.body);
 
     // write data to request body
@@ -3031,6 +3033,16 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
     }
     req.end();
 }
+
+function forward_coap(forwardcbhost, request) {
+
+    debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} length: ${request.body.length}`);
+    is_comm.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, 'SIT5').then((result) => {
+        debug('-- done forwarding coap');
+    });
+}
+
+
 
 var std_check_state = [];
 std_check_state.push({

@@ -2852,7 +2852,8 @@ function check_csr(absolute_url, request, response) {
 
                         console.log('csebase forwarding to ' + point.forwardcbname);
 
-                        forward_http(point.forwardcbhost, point.forwardcbport, request, response);
+                        //forward_http(point.forwardcbhost, point.forwardcbport, request, response);
+                        forward_coap(point.forwardcbhost, request);
                     }
                     else if (poa.protocol == 'mqtt:') {
                         point.forwardcbmqtt = poa.hostname;
@@ -3002,6 +3003,14 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
     }
     req.end();
 }
+
+function forward_coap(forwardcbhost, request) {
+    debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} length: ${request.body.length}`);
+    is_comm.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, 'SIT5').then((result) => {
+        debug('-- Done forwarding coap');
+    });
+}
+
 
 if (process.env.NODE_ENV == 'production') {
     //console.log("Production Mode");

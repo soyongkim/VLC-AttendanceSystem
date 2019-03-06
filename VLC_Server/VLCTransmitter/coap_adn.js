@@ -39,6 +39,7 @@ function coap_request(path, method, ty, bodyString, callback) {
     if(method === 'post') {
         var a = (ty==='') ? '': ('; ty='+ty);
         options.options['Content-Type'] = 'application/' + conf.ae.bodytype + a;
+        debug(`-- post pass --`)
     }
     else if(method === 'put') {
         options.options['Content-Type'] = 'application/' + conf.ae.bodytype;
