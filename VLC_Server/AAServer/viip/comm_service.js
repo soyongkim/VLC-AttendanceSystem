@@ -1,4 +1,8 @@
 var http = require('http');
+var coap = require('coap');
+var xml2js = require('xml2js');
+var cbor = require('cbor');
+
 const Promise = require('bluebird');
 const shortid = require('shortid');
 const conf = require('./is_conf.js');
@@ -75,13 +79,12 @@ const onem2m_coap_request = (path, method, ty, bodyString, origin) => {
     return new Promise((resolve, reject) => {
     var options = {
         host: conf.cse.host,
-        port: conf.cse.port,
+        port: 5683,
         pathname: path,
         method: method,
         confirmable: 'false',
         options: {
-            'Accept': 'application/'+conf.ae.bodytype,
-            'X-M2M-RI' : origin
+            'Accept': 'application/json'
         }
     };
 
@@ -91,15 +94,15 @@ const onem2m_coap_request = (path, method, ty, bodyString, origin) => {
 
     if(method === 'post') {
         var a = (ty==='') ? '': ('; ty='+ty);
-        options.options['Content-Type'] = 'application/' + conf.ae.bodytype + a;
+        options.options['Content-Type'] = 'application/json' + a;
     }
     else if(method === 'put') {
-        options.options['Content-Type'] = 'application/' + conf.ae.bodytype;
+        options.options['Content-Type'] = 'application/json';
     }
 
     var res_body = '';
     var req = coap.request(options);
-    req.setOption("256", new Buffer(conf.ae.id));      // X-M2M-Origin
+    req.setOption("256", new Buffer(origin));      // X-M2M-Origin
     req.setOption("257", new Buffer(shortid.generate()));    // X-M2M-RI
 
     if(method === 'post') {

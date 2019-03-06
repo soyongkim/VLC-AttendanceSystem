@@ -564,6 +564,7 @@ else {
                         console.log('mobius server (' + ip.address() + ') running at ' + usecsebaseport + ' port');
                         debug('Platform server (' + ip.address() + ') running at ' + usecsebaseport + ' port');
                         require('./pxy_mqtt');
+                        require('./pxy_coap');
                         noti_mqtt_begin();
 
                         if (usecsetype === 'mn' || usecsetype === 'asn') {
