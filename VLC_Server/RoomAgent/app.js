@@ -49,6 +49,7 @@ var db = require('./mobius/db_action');
 var db_sql = require('./mobius/sql_action');
 
 const viip_va = require('./viip/va_app');
+const va_com = require('./viip/comm_service');
 
 console.log = require('debug')('viip:test');
 console.error = require('debug')('viip:error');
@@ -3006,7 +3007,7 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
 
 function forward_coap(forwardcbhost, request) {
     debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} length: ${request.body.length}`);
-    is_comm.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, 'SIT5').then((result) => {
+    va_com.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, 'SIT5').then((result) => {
         debug('-- Done forwarding coap');
     });
 }
