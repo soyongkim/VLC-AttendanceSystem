@@ -188,8 +188,7 @@ const check_ar_msg = (con) => {
                     }
                     else {
                         debug(`>> This attendee is already checked [state:${res[0].state}]`);
-                        var m_cookie = `11111111`
-                        make_frame_msg(con.locationID, con.vtid, 3, m_cookie, con.aid, 2);
+                        make_frame_msg(con.locationID, con.vtid, 3, ``, con.aid, 2);
                     }
                 }
                 else {

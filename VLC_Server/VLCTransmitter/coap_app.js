@@ -25,6 +25,10 @@ var shortid = require('shortid');
 global.sh_adn = require('./coap_adn');
 var noti = require('./noti');
 var tas = require('./thyme_tas');
+var vt = require('./vt_module/vt');
+
+console.log = require('debug')('viip:debug');
+var debug = require('debug')(`viip:${mode}`);
 
 var COAP_SUBSCRIPTION_ENABLE = 0;
 var MQTT_SUBSCRIPTION_ENABLE = 0;
@@ -251,7 +255,8 @@ function coap_watchdog() {
 
                     ready_for_notification();
 
-                    tas.ready();
+                    //tas.ready();
+                    vt.init();
 
                     // var _ae = {};
                     // _ae.id = conf.ae.id;

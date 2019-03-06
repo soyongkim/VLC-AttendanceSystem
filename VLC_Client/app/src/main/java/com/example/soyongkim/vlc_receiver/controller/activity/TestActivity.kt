@@ -72,7 +72,40 @@ class TestActivity : AppCompatActivity() {
     private fun updateReceivedData(data: ByteArray) {
         var message = "Read : " + data.size + " bytes \n" + HexDump.toHexString(data) + "\n"
         // if you want to see formal data, use it
-        message += "vtid($rcvdId) | type($rcvdType) | cookie(${HexDump.toHexString(rcvdCookie)}) | aid(${rcvdAid}) | state(${rcvdState})\n"
+        var stateName =""
+        when(rcvdState) {
+            0 -> {
+                stateName = "Approval"
+            }
+            1 -> {
+                stateName = "Late"
+            }
+            2 -> {
+                stateName = "Checked"
+            }
+        }
+
+        var typeName = ""
+        when(rcvdType) {
+            0 -> {
+                typeName = "IDLE"
+                message += "vtid($rcvdId) | type($rcvdType = $typeName)\ncookie(Not Used) | aid(Not Used) | state(Not Used)\n"
+            }
+            1 -> {
+                typeName = "ACTIVE"
+                message += "vtid($rcvdId) | type($rcvdType = $typeName)\ncookie(Not Used) | aid(Not Used) | state(Not Used)\n"
+            }
+            2 -> {
+                typeName = "VERIFY"
+                message += "vtid($rcvdId) | type($rcvdType = $typeName)\ncookie(${HexDump.toHexString(rcvdCookie)})\naid(${rcvdAid})\nstate(Not Used)\n"
+            }
+            3 -> {
+                typeName = "RESULT"
+                message += "vtid($rcvdId) | type($rcvdType = $typeName)\ncookie(Not Used)\naid(${rcvdAid})\nstate(${rcvdState} = ${stateName})\n"
+            }
+        }
+        message += "------------------------------------------\n"
+
         mDumpTextView.append(message)
         mScrollView.smoothScrollTo(0, mDumpTextView.bottom)
     }

@@ -24,7 +24,7 @@ var acp = {};
 // vr or vt mode
 global.mode = 'vt';
 
-conf.useprotocol = 'http'; // select one for 'http' or 'mqtt' or 'coap' or 'ws'
+conf.useprotocol = 'coap'; // select one for 'http' or 'mqtt' or 'coap' or 'ws'
 
 // build cse
 cse.host        = '192.168.34.4';

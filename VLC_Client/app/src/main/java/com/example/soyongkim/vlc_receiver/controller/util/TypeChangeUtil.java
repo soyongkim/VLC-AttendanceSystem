@@ -49,7 +49,7 @@ public class TypeChangeUtil {
 
     public static int byteToState(byte[] src) {
         byte[] data = new byte[1];
-        data[0] = src[20];
+        data[0] = src[19];
         return new BigInteger(data).intValue();
     }
 

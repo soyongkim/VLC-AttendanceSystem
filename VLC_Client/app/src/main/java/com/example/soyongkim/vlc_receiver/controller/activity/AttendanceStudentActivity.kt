@@ -64,7 +64,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
     private lateinit var rcvdAid : String
     private var rcvdState : Int = 0
 
-    private lateinit var bData : ByteArray
+    private var bData : String = "init"
     internal var chkDupFrm = false
 
     private val mExecutor = Executors.newCachedThreadPool()
@@ -78,8 +78,6 @@ class AttendanceStudentActivity : AppCompatActivity() {
         override fun onNewData(data: ByteArray) {
             this@AttendanceStudentActivity.runOnUiThread {
                 try {
-                    //bData = data
-
                     rcvdId = TypeChangeUtil.byteToId(data)
                     rcvdType = TypeChangeUtil.byteToType(data)
                     rcvdCookie = TypeChangeUtil.byteToCookie(data)
@@ -96,6 +94,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
                     }
                     else if(vrState == WAIT_SPEC_STATE) {
                         if(rcvdType == VERIFY || rcvdType == RESULT) {
+                            checkDupFrame(data)
                             if(rcvdAid == sid && chkDupFrm == false) {
                                 processVLCdata()
                             }
@@ -109,7 +108,8 @@ class AttendanceStudentActivity : AppCompatActivity() {
     }
 
     private fun checkDupFrame(data : ByteArray) {
-        if(bData != data) {
+        var curData = HexDump.toHexString(data)
+        if(bData != curData) {
             chkDupFrm = false
         }
         else {
@@ -117,7 +117,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
             chkDupFrm = true
         }
 
-        bData = data
+        bData = curData
     }
 
     /* Response callback Interface */
@@ -256,6 +256,8 @@ class AttendanceStudentActivity : AppCompatActivity() {
                     }
                 })
     }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

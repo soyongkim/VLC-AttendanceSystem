@@ -80,7 +80,7 @@ const del_vt = (ae_rn, ae_name) => {
 const check_vt_state_table = () => {
     debug(`-- VT STATE TABLE --`);
     for (var i = 0; i < vt_mapping_table.length; i++) {
-        debug(`[vt${i}] name: ${vt_mapping_table[i].vt_name} | rn: ${vt_mapping_table[i].vt_rn} | state: ${vt_mapping_table[i].vt_state}`);
+        debug(`[${i}] name: ${vt_mapping_table[i].vt_name} | rn: ${vt_mapping_table[i].vt_rn} | state: ${vt_mapping_table[i].vt_state}`);
     }
 };
 
