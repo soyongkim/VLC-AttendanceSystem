@@ -71,6 +71,91 @@ const onem2m_http_request = (path, method, ty, bodyString, origin) => {
     });
 };
 
+const onem2m_coap_request = (path, method, ty, bodyString, origin) => {
+    return new Promise((resolve, reject) => {
+    var options = {
+        host: conf.cse.host,
+        port: conf.cse.port,
+        pathname: path,
+        method: method,
+        confirmable: 'false',
+        options: {
+            'Accept': 'application/'+conf.ae.bodytype,
+            'X-M2M-RI' : origin
+        }
+    };
+
+    if(bodyString.length > 0) {
+        options.options['Content-Length'] = bodyString.length;
+    }
+
+    if(method === 'post') {
+        var a = (ty==='') ? '': ('; ty='+ty);
+        options.options['Content-Type'] = 'application/' + conf.ae.bodytype + a;
+    }
+    else if(method === 'put') {
+        options.options['Content-Type'] = 'application/' + conf.ae.bodytype;
+    }
+
+    var res_body = '';
+    var req = coap.request(options);
+    req.setOption("256", new Buffer(conf.ae.id));      // X-M2M-Origin
+    req.setOption("257", new Buffer(shortid.generate()));    // X-M2M-RI
+
+    if(method === 'post') {
+        var ty_buf = new Buffer(1);
+        ty_buf.writeUInt8(parseInt(ty, 10), 0);
+        req.setOption("267", ty_buf);    // X-M2M-TY
+    }
+
+    req.on('response', function (res) {
+        res.on('data', function () {
+            res_body += res.payload.toString();
+        });
+
+        res.on('end', function () {
+            console.log(res_body);
+            if(conf.ae.bodytype == 'xml') {
+                var parser = new xml2js.Parser({explicitArray: false});
+                parser.parseString(res_body, function (err, jsonObj) {
+                    if (err) {
+                        console.log('[http_adn] xml2js parser error]');
+                        return reject(e);
+                    }
+                    else {
+                        return resolve(res, jsonObj);
+                    }
+                });
+            }
+            else if(conf.ae.bodytype == 'cbor') {
+                cbor.decodeFirst(res_body, function(err, jsonObj) {
+                    if (err) {
+                        console.log('[http_adn] cbor parser error]');
+                        return reject(e);
+                    }
+                    else {
+                        return resolve(res, jsonObj);
+                    }
+                });
+            }
+            else {
+                var jsonObj = JSON.parse(res_body);
+                return resolve(res, jsonObj);
+            }
+        });
+    });
+
+    req.on('error', function (e) {
+        console.log(e);
+    });
+
+    req.write(bodyString);
+    req.end();
+    });
+}
+
+
+
 // Start to initialize resoruces
 const init = () => {
     // if you don't want to make AE or Container, comment out these lines
@@ -270,7 +355,8 @@ const crt_cin = (cnt, content, origin) => {
 
     bodyString = JSON.stringify(results_ci);
 
-    onem2m_http_request(cnt, 'post', '4', bodyString, origin).then((result) => {
+    // change http to coap
+    onem2m_coap_request(cnt, 'post', '4', bodyString, origin).then((result) => {
         var status = '';
         if (result.headers)
             status = result.headers['x-m2m-rsc'];

@@ -29,6 +29,10 @@ var _this = this;
 
 var coap_state = 'init';
 
+var coap_port = 5683;
+
+var debug = require("debug")("viip:pxycoap");
+
 //var custom = new process.EventEmitter();
 var events = require('events');
 var coap_custom = new events.EventEmitter();
@@ -81,7 +85,7 @@ coap_state = 'init';
 //}, 2000);
 
 var pxycoap_server = null;
-
+debug("Proxy CoAP is Running...");
 //coap_custom.on('coap_watchdog', function() {
 exports.coap_watchdog = function () {
     if(coap_state === 'init') {
@@ -90,41 +94,41 @@ exports.coap_watchdog = function () {
     else if(coap_state === 'connect') {
         if(pxycoap_server == null) {
             pxycoap_server = coap.createServer();
-            pxycoap_server.listen(usecsebaseport, function() {
-                // var options = {
-                //     host: 'localhost',
-                //     port: usecsebaseport,
-                //     pathname: '/'+usecsebase,
-                //     method: 'get',
-                //     confirmable: 'false',
-                //     options: {
-                //         'Accept': 'application/json'
-                //     }
-                // };
-                //
-                // var bodyString = '';
-                // var responseBody = '';
-                // var req = coap.request(options);
-                // req.setOption("256", new Buffer(usecseid));      // X-M2M-Origin
-                // req.setOption("257", new Buffer('hello'));    // X-M2M-RI
-                // req.on('response', function (res) {
-                //     res.on('data', function () {
-                //         responseBody += res.payload.toString();
-                //     });
-                //
-                //     res.on('end', function () {
-                //         if(res.code == '2.05') {
-                //             coap_state = 'ready';
-                //             console.log('[pxy_coap] coap ready');
-                //         }
-                //     });
-                // });
-                // req.on('error', function (e) {
-                //     console.log(e);
-                // });
-                //
-                // req.write(bodyString);
-                // req.end();
+            pxycoap_server.listen(coap_port, function() {
+                var options = {
+                    host: 'localhost',
+                    port: coap_port,
+                    pathname: '/'+usecsebase,
+                    method: 'get',
+                    confirmable: 'false',
+                    options: {
+                        'Accept': 'application/json'
+                    }
+                };
+                
+                var bodyString = '';
+                var responseBody = '';
+                var req = coap.request(options);
+                req.setOption("256", new Buffer(usecseid));      // X-M2M-Origin
+                req.setOption("257", new Buffer('hello'));    // X-M2M-RI
+                req.on('response', function (res) {
+                    res.on('data', function () {
+                        responseBody += res.payload.toString();
+                    });
+                
+                    res.on('end', function () {
+                        if(res.code == '2.05') {
+                            coap_state = 'ready';
+                            console.log('[pxy_coap] coap ready');
+                        }
+                    });
+                });
+                req.on('error', function (e) {
+                    console.log(e);
+                });
+                
+                req.write(bodyString);
+                req.end();
             });
 
 
