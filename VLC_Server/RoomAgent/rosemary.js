@@ -101,7 +101,7 @@ else if (process.env.NODE_ENV === 'development') {
 
     global.usetsagentport       = '7572';
 
-    global.usemqttbroker        = parent_mqttbroker; // mobius to mqttbroker
+    global.usemqttbroker        = parent_mqttbroker; // mqttbroker in mobius platform
     global.usesecure            = 'disable';
     if(usesecure === 'enable') {
         global.usemqttport      = '8883';

@@ -3035,10 +3035,10 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
 }
 
 function forward_coap(forwardcbhost, request, response) {
-    debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} origin: ${JSON.stringify(request.body)}`);
-    is_comm.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, 'SIT5').then((result) => {
+    //debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} origin: ${JSON.stringify(request.headers['x-m2m-origin'])}`);
+    is_comm.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, request.headers['x-m2m-origin']).then((result) => {
         debug('-- Done forwarding coap');
-        response.send(result);
+        //response.send(result);
     });
 }
 

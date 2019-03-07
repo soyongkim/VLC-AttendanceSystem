@@ -39,7 +39,9 @@ exports.process_request = function (request, parent, body_Obj, ty) {
     // route Container
     var cnt_rsc_nm = url.parse(parent['ri']).pathname.split('/')[2];
     if (cnt_rsc_nm == 'cnt-Client-Message') {
-        sql.select_csr_poa(request.headers.host, function (err, result) {
+        debug(`-- request headers host : ${request.headers.remoteaddress}`);
+        // if you use coap, host is remoteaddress, but if http, you have to use host
+        sql.select_csr_poa(request.headers.remoteaddress, function (err, result) {
             if (!err) {
                 con.locationID = result[0].cb;
                 if (con.type == 'ar') {

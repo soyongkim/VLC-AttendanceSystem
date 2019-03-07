@@ -22,6 +22,7 @@ var fs = require('fs');
 var http = require('http');
 var https = require('https');
 var coap = require('coap');
+var conf = require('./conf_mn.json');
 
 global.NOPRINT = 'true';
 

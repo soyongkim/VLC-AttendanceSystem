@@ -3006,7 +3006,7 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
 }
 
 function forward_coap(forwardcbhost, request, response) {
-    var method = request.method.toLowerCase()
+    var method = request.method.toLowerCase();
     debug(`forward body: ${request.body} method: ${method} origin: ${JSON.stringify(request.headers['x-m2m-origin'])}`);
     if(method == 'get') {
         va_com.onem2m_coap_request(forwardcbhost, request.url, method, '', '', request.headers['x-m2m-origin']).then((result) => {

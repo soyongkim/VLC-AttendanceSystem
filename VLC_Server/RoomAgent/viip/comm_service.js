@@ -89,7 +89,7 @@ const onem2m_coap_request = (host, path, method, ty, bodyString, origin) => {
         method: method,
         confirmable: 'false',
         options: {
-            'Accept': 'application/' + markup
+            'Accept': 'application/json'
         }
     };
 
@@ -99,10 +99,10 @@ const onem2m_coap_request = (host, path, method, ty, bodyString, origin) => {
 
     if(method === 'post') {
         var a = (ty==='') ? '': ('; ty='+ty);
-        options.options['Content-Type'] = 'application/json'+ markup + a;
+        options.options['Content-Type'] = 'application/'+ markup + a;
     }
     else if(method === 'put') {
-        options.options['Content-Type'] = 'application/json'+ markup;
+        options.options['Content-Type'] = 'application/'+ markup;
     }
 
     var res_body = '';
