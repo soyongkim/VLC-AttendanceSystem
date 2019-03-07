@@ -3007,14 +3007,14 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
 
 function forward_coap(forwardcbhost, request, response) {
     var method = request.method.toLowerCase()
-    debug(`forward body: ${request.body} method: ${method} length: ${request.body.length}`);
+    debug(`forward body: ${request.body} method: ${method} origin: ${JSON.stringify(request.headers['x-m2m-origin'])}`);
     if(method == 'get') {
-        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '', '', 'SRA').then((result) => {
+        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '', '', request.headers['x-m2m-origin']).then((result) => {
             debug('-- Done forwarding coap(get)');
             response.send(result);
         });
     } else {
-        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '4', request.body, 'SRA').then((result) => {
+        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '4', request.body, request.headers['x-m2m-origin']).then((result) => {
             debug('-- Done forwarding coap(post)');
             response.send(result);
         });  

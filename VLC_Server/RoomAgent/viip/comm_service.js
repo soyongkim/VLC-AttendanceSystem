@@ -76,6 +76,12 @@ const onem2m_http_request = (path, method, ty, bodyString, origin) => {
 
 const onem2m_coap_request = (host, path, method, ty, bodyString, origin) => {
     return new Promise((resolve, reject) => {
+    
+    var markup = "json";
+    
+    if(origin == "VLC-Receiver")
+        markup = "xml";
+
     var options = {
         host: host,
         port: 5683,
@@ -83,7 +89,7 @@ const onem2m_coap_request = (host, path, method, ty, bodyString, origin) => {
         method: method,
         confirmable: 'false',
         options: {
-            'Accept': 'application/json'
+            'Accept': 'application/' + markup
         }
     };
 
@@ -93,10 +99,10 @@ const onem2m_coap_request = (host, path, method, ty, bodyString, origin) => {
 
     if(method === 'post') {
         var a = (ty==='') ? '': ('; ty='+ty);
-        options.options['Content-Type'] = 'application/json' + a;
+        options.options['Content-Type'] = 'application/json'+ markup + a;
     }
     else if(method === 'put') {
-        options.options['Content-Type'] = 'application/json';
+        options.options['Content-Type'] = 'application/json'+ markup;
     }
 
     var res_body = '';

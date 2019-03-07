@@ -2882,7 +2882,7 @@ function check_csr(absolute_url, request, response) {
 
                         console.log('csebase forwarding to ' + point.forwardcbname);
                         // check forwarding
-                        forward_coap(point.forwardcbhost, request);
+                        forward_coap(point.forwardcbhost, request, response);
                         //forward_http(point.forwardcbhost, point.forwardcbport, request, response);
                     }
                     else if (poa.protocol == 'mqtt:') {
@@ -3035,7 +3035,7 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
 }
 
 function forward_coap(forwardcbhost, request, response) {
-    debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} length: ${request.body.length}`);
+    debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} origin: ${JSON.stringify(request.body)}`);
     is_comm.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, 'SIT5').then((result) => {
         debug('-- Done forwarding coap');
         response.send(result);
