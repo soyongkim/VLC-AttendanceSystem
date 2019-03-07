@@ -203,7 +203,7 @@ function coap_message_handler(request, response) {
             });
 
             res.on('end', function () {
-                console.log('<----- [pxy_coap]');
+                console.log('<----- [pxy_coap]: http\'s response');
                 console.log(responseBody);
 
                 var rsc = new Buffer(2);
@@ -258,7 +258,7 @@ function coap_message_handler(request, response) {
     });
 
     var bodyString = request.payload.toString();
-    console.log('-----> [pxy_coap]');
+    console.log('-----> [pxy_coap]: coap to http');
     console.log(bodyString);
 
     // write data to request body

@@ -2854,7 +2854,7 @@ function check_csr(absolute_url, request, response) {
                         console.log('csebase forwarding to ' + point.forwardcbname);
 
                         //forward_http(point.forwardcbhost, point.forwardcbport, request, response);
-                        forward_coap(point.forwardcbhost, request);
+                        forward_coap(point.forwardcbhost, request, response);
                     }
                     else if (poa.protocol == 'mqtt:') {
                         point.forwardcbmqtt = poa.hostname;
@@ -3005,16 +3005,18 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
     req.end();
 }
 
-function forward_coap(forwardcbhost, request) {
+function forward_coap(forwardcbhost, request, response) {
     var method = request.method.toLowerCase()
     debug(`forward body: ${request.body} method: ${method} length: ${request.body.length}`);
     if(method == 'get') {
-        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '', '', 'SIT5').then((result) => {
+        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '', '', 'SRA').then((result) => {
             debug('-- Done forwarding coap(get)');
+            response.send(result);
         });
     } else {
-        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '4', request.body, 'SIT5').then((result) => {
+        va_com.onem2m_coap_request(forwardcbhost, request.url, method, '4', request.body, 'SRA').then((result) => {
             debug('-- Done forwarding coap(post)');
+            response.send(result);
         });  
     }
 }

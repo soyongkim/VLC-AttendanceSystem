@@ -3034,11 +3034,11 @@ function forward_http(forwardcbhost, forwardcbport, request, response) {
     req.end();
 }
 
-function forward_coap(forwardcbhost, request) {
-
+function forward_coap(forwardcbhost, request, response) {
     debug(`forward body: ${request.body} method: ${request.method.toLowerCase()} length: ${request.body.length}`);
     is_comm.onem2m_coap_request(forwardcbhost, request.url, request.method.toLowerCase(), '4', request.body, 'SIT5').then((result) => {
-        debug('-- done forwarding coap');
+        debug('-- Done forwarding coap');
+        response.send(result);
     });
 }
 
