@@ -1,5 +1,7 @@
 package com.example.soyongkim.vlc_receiver.model.onem2m
 
+import com.example.soyongkim.vlc_receiver.controller.util.JsonFormatter
+
 /**
  * Created by Home on 2018-11-08.
  */
@@ -22,5 +24,9 @@ class ContentInstanceObject(private var _content: String) {
         xml += "</m2m:cin>"
 
         return xml
+    }
+
+    fun makeJSON(): String {
+        return JsonFormatter.makeOneM2MFormat(content)
     }
 }

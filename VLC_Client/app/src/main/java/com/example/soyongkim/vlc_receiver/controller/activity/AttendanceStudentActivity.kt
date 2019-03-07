@@ -18,6 +18,7 @@ import android.util.Log
 import android.util.Xml
 import android.widget.Toast
 import com.example.soyongkim.vlc_receiver.controller.util.HttpResponseEventRouter
+import com.example.soyongkim.vlc_receiver.controller.util.JsonFormatter
 import com.example.soyongkim.vlc_receiver.controller.util.TypeChangeUtil
 import com.example.soyongkim.vlc_receiver.model.item.UsbSingleton
 import com.example.soyongkim.vlc_receiver.model.service.HttpRequestService
@@ -130,7 +131,8 @@ class AttendanceStudentActivity : AppCompatActivity() {
             ACTIVE -> {
                 Toast.makeText(applicationContext, "Received ACTIVE Frame", Toast.LENGTH_SHORT).show()
                 var type = "ar"
-                var arPayload = "<vtid>${rcvdId}</vtid><aid>${sid}</aid><type>${type}</type>"
+                //var arPayload = "<vtid>${rcvdId}</vtid><aid>${sid}</aid><type>${type}</type>"
+                var arPayload = JsonFormatter.makeARPayload(rcvdId, sid, type)
                 sendMessage(arPayload, type)
                 vrState = WAIT_SPEC_STATE
 
@@ -138,7 +140,8 @@ class AttendanceStudentActivity : AppCompatActivity() {
             VERIFY -> {
                 Toast.makeText(applicationContext, "Received VERIFY Frame", Toast.LENGTH_SHORT).show()
                 var type = "vr"
-                var vrPayload = "<vtid>${rcvdId}</vtid><cookie>${HexDump.toHexString(rcvdCookie)}</cookie><aid>${sid}</aid><type>${type}</type>"
+                //var vrPayload = "<vtid>${rcvdId}</vtid><cookie>${HexDump.toHexString(rcvdCookie)}</cookie><aid>${sid}</aid><type>${type}</type>"
+                var vrPayload = JsonFormatter.makeVRPayload(rcvdAid, HexDump.toHexString(rcvdCookie), sid, type);
                 sendMessage(vrPayload, type)
             }
             RESULT -> {
@@ -227,27 +230,27 @@ class AttendanceStudentActivity : AppCompatActivity() {
                     override fun route(context: Context, code: Int, arg: String) {
                         runOnUiThread {
                             if (code == 201) {
-                                var parser : XmlPullParser = Xml.newPullParser()
-                                parser.setInput(StringReader(arg))
-                                var eventType = parser.eventType
-                                var flag = 0
-                                var con : String = ""
-                                while (eventType != XmlPullParser.END_DOCUMENT) {
-                                    if (eventType == XmlPullParser.START_DOCUMENT) {
-                                        // XML 데이터 시작
-                                    } else if (eventType == XmlPullParser.START_TAG) {
-                                        // 시작 태그가 파싱. "<TAG>"
-                                        if(parser.getName() == "con")
-                                            flag = 1
-                                    } else if (eventType == XmlPullParser.TEXT) {
-                                        // 시작 태그와 종료 태그 사이의 텍스트. "<TAG>TEXT</TAG>"
-                                        if(flag == 1) {
-                                            con = parser.getText()
-                                            flag = 0
-                                        }
-                                    }
-                                    eventType = parser.next()
-                                }
+//                                var parser : XmlPullParser = Xml.newPullParser()
+//                                parser.setInput(StringReader(arg))
+//                                var eventType = parser.eventType
+//                                var flag = 0
+//                                var con : String = ""
+//                                while (eventType != XmlPullParser.END_DOCUMENT) {
+//                                    if (eventType == XmlPullParser.START_DOCUMENT) {
+//                                        // XML 데이터 시작
+//                                    } else if (eventType == XmlPullParser.START_TAG) {
+//                                        // 시작 태그가 파싱. "<TAG>"
+//                                        if(parser.getName() == "con")
+//                                            flag = 1
+//                                    } else if (eventType == XmlPullParser.TEXT) {
+//                                        // 시작 태그와 종료 태그 사이의 텍스트. "<TAG>TEXT</TAG>"
+//                                        if(flag == 1) {
+//                                            con = parser.getText()
+//                                            flag = 0
+//                                        }
+//                                    }
+//                                    eventType = parser.next()
+//                                }
                                 //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.SUCCESS), 1000)
                             } else {
                                 //mHandler.sendMessageDelayed(mHandler.obtainMessage(AttendanceStudentActivity.FAIL), 1000)

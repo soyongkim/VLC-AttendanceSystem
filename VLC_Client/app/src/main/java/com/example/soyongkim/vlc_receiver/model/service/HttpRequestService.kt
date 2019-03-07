@@ -35,7 +35,7 @@ class HttpRequestService : Service(){
                 var urlString : String = cseBase.serviceUrl + urlResource
                 val url = URL(urlString)
                 val urlConn = url.openConnection() as HttpURLConnection
-                urlConn.setRequestProperty("content-type" , "application/xml")
+                urlConn.setRequestProperty("content-type" , "application/json")
                 urlConn.setRequestProperty("X-M2M-RI", "12345")
                 urlConn.setRequestProperty("X-M2M-Origin" , "VLC-Receiver")
                 urlConn.setRequestProperty("nmtype" , "long")
@@ -68,9 +68,10 @@ class HttpRequestService : Service(){
                 var reqContent : String = ""
 
                 if(type == 4) {
-                    reqContent = ContentInstanceObject(payload).makeXML()
-                    urlConn.setRequestProperty("Accept", "application/xml")
-                    urlConn.setRequestProperty("Content-Type", "application/vnd.onem2m-res+xml;ty=4")
+                    //reqContent = ContentInstanceObject(payload).makeXML()
+                    reqContent = payload
+                    urlConn.setRequestProperty("Accept", "application/json")
+                    urlConn.setRequestProperty("Content-Type", "application/json;ty=4")
                     urlConn.setRequestProperty("locale", "ko")
                     urlConn.setRequestProperty("X-M2M-RI", "12345")
                     urlConn.setRequestProperty("X-M2M-Origin", "VLC-Receiver")

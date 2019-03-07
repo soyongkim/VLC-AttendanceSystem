@@ -76,11 +76,6 @@ const onem2m_http_request = (path, method, ty, bodyString, origin) => {
 
 const onem2m_coap_request = (host, path, method, ty, bodyString, origin) => {
     return new Promise((resolve, reject) => {
-    
-    var markup = "json";
-    
-    if(origin == "VLC-Receiver")
-        markup = "xml";
 
     var options = {
         host: host,
@@ -99,10 +94,10 @@ const onem2m_coap_request = (host, path, method, ty, bodyString, origin) => {
 
     if(method === 'post') {
         var a = (ty==='') ? '': ('; ty='+ty);
-        options.options['Content-Type'] = 'application/'+ markup + a;
+        options.options['Content-Type'] = 'application/json'+ a;
     }
     else if(method === 'put') {
-        options.options['Content-Type'] = 'application/'+ markup;
+        options.options['Content-Type'] = 'application/json';
     }
 
     var res_body = '';
