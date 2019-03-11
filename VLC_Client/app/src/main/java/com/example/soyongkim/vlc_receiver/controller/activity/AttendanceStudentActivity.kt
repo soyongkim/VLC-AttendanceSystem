@@ -73,6 +73,9 @@ class AttendanceStudentActivity : AppCompatActivity() {
 
     private lateinit var receiveTimer: TimerTask
 
+    private var nStart : Long = 0
+    private var nEnd : Long = 0
+
     private val mListener = object : SerialInputOutputManager.Listener {
         override fun onRunError(e: Exception) {}
 
@@ -90,12 +93,14 @@ class AttendanceStudentActivity : AppCompatActivity() {
                     //Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()
 
                     if(vrState == INIT_STATE) {
-                        if(rcvdType == ACTIVE)
+                        if(rcvdType == ACTIVE) {
                             processVLCdata()
+                            nStart = System.currentTimeMillis()
+                        }
                     }
                     else if(vrState == WAIT_SPEC_STATE) {
                         if(rcvdType == VERIFY || rcvdType == RESULT) {
-                            checkDupFrame(data)
+                            //checkDupFrame(data)
                             if(rcvdAid == sid && chkDupFrm == false) {
                                 processVLCdata()
                             }
@@ -141,7 +146,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Received VERIFY Frame", Toast.LENGTH_SHORT).show()
                 var type = "vr"
                 //var vrPayload = "<vtid>${rcvdId}</vtid><cookie>${HexDump.toHexString(rcvdCookie)}</cookie><aid>${sid}</aid><type>${type}</type>"
-                var vrPayload = JsonFormatter.makeVRPayload(rcvdAid, HexDump.toHexString(rcvdCookie), sid, type);
+                var vrPayload = JsonFormatter.makeVRPayload(rcvdId, HexDump.toHexString(rcvdCookie), sid, type);
                 sendMessage(vrPayload, type)
             }
             RESULT -> {
@@ -172,6 +177,8 @@ class AttendanceStudentActivity : AppCompatActivity() {
                     dialog = null
                     receiveTimer.cancel()
                     finish()
+                    nEnd = System.currentTimeMillis()
+                    Toast.makeText(this@AttendanceStudentActivity, "Processing Time:${nEnd-nStart}", Toast.LENGTH_LONG).show()
                 }
             }
             AttendanceStudentActivity.SUCCESS -> handleSuccess()

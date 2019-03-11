@@ -25,8 +25,4 @@ class ContentInstanceObject(private var _content: String) {
 
         return xml
     }
-
-    fun makeJSON(): String {
-        return JsonFormatter.makeOneM2MFormat(content)
-    }
 }

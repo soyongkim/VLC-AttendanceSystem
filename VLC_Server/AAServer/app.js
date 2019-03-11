@@ -2882,8 +2882,8 @@ function check_csr(absolute_url, request, response) {
 
                         console.log('csebase forwarding to ' + point.forwardcbname);
                         // check forwarding
-                        forward_coap(point.forwardcbhost, request, response);
-                        //forward_http(point.forwardcbhost, point.forwardcbport, request, response);
+                        //forward_coap(point.forwardcbhost, request, response);
+                        forward_http(point.forwardcbhost, point.forwardcbport, request, response);
                     }
                     else if (poa.protocol == 'mqtt:') {
                         point.forwardcbmqtt = poa.hostname;

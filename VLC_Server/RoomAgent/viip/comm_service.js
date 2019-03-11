@@ -359,7 +359,7 @@ const crt_cin = (cnt, content, origin) => {
     bodyString = JSON.stringify(results_ci);
 
     // change http to coap
-    onem2m_coap_request(conf.cse.host, cnt, 'post', '4', bodyString, origin).then((result) => {
+    onem2m_http_request(cnt, 'post', '4', bodyString, origin).then((result) => {
         var status = '';
         if (result.headers)
             status = result.headers['x-m2m-rsc'];
