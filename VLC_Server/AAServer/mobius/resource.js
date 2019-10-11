@@ -1640,7 +1640,7 @@ exports.create = function (request, response, ty, body_Obj, callback) {
                                                 // create con{check : "o"} in cin
                                                 var cnt = `/Mobius/std_${res.sid}/cnt-state`;
                                                 // 동기적으로 cin 만들고 success 처리를 해야함. 일단 보류
-                                                //is_app.create_cin_local(cnt, "o");
+                                                is_app.create_cin_local(cnt, "o");
                                                 // change con
                                                 create_Obj[rootnm].con = "success";
                                             }
