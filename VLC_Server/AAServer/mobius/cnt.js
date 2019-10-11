@@ -20,6 +20,8 @@ var xmlbuilder = require('xmlbuilder');
 var util = require('util');
 var responder = require('./responder');
 
+const debug = require('debug')('viip:cnt_debug');
+
 
 exports.build_cnt = function(request, response, resource_Obj, body_Obj, callback) {
     var rootnm = request.headers.rootnm;
@@ -68,7 +70,6 @@ exports.build_cnt = function(request, response, resource_Obj, body_Obj, callback
         callback('0', resource_Obj);
         return '0';
     }
-
 
     resource_Obj[rootnm].li = (body_Obj[rootnm].li) ? body_Obj[rootnm].li : '';
     resource_Obj[rootnm].or = (body_Obj[rootnm].or) ? body_Obj[rootnm].or : '';

@@ -133,6 +133,7 @@ function sgn_action(rootnm, check_value, results_ss, noti_Obj, sub_bodytype) {
     var nct = results_ss.nct;
     var enc_Obj = results_ss.enc;
     var net_arr = enc_Obj.net;
+
     for (var j = 0; j < net_arr.length; j++) {
         /* for testing, make comment statement
         if (net_arr[j] == check_value) { // 1 : Update_of_Subscribed_Resource, 3 : Create_of_Direct_Child_Resource, 4 : Delete_of_Direct_Child_Resource
@@ -462,9 +463,7 @@ function sgn_action(rootnm, check_value, results_ss, noti_Obj, sub_bodytype) {
                                 request_noti_ws(nu, results_ss.ri, bodyString, sub_bodytype, xm2mri);
                             }
                             else { // mqtt:
-                                //console.log('[MQTT] A');
                                 bodyString = make_json_noti_message(nu, node, xm2mri, short_flag);
-                                //console.log('[MQTT] B');
                                 request_noti_mqtt(nu, results_ss.ri, bodyString, sub_bodytype, xm2mri);
                             }
                         }
@@ -760,18 +759,16 @@ exports.response_noti_handler = function(topic, message) {
 
 var cache_ttl = 2;
 function request_noti_mqtt(nu, ri, bodyString, bodytype, xm2mri) {
-  //  console.log("[MQTT] A");
     if(noti_mqtt == null) {
         console.log('[request_noti_mqtt] noti_mqtt is not connected to Mobius');
         return '0';
     }
 
     try {
-        //console.log("[MQTT] B");
         var aeid = url.parse(nu).pathname.replace('/', '').split('?')[0];
         var noti_resp_topic = '/oneM2M/resp/' + usecseid.replace('/', '') + '/' + aeid + '/' + bodytype;
         var noti_resp_topic2 = '/oneM2M/resp/' + usecsebase + '/' + aeid + '/' + bodytype;
-      //  console.log("[MQTT] C");
+
         if(ss_fail_count[ri] == null) {
             ss_fail_count[ri] = 0;
         }
@@ -920,3 +917,4 @@ function delete_sub(ri, xm2mri) {
     req.write('');
     req.end();
 }
+

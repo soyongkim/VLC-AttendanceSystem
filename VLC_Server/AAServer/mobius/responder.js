@@ -1900,6 +1900,9 @@ exports.search_result = function(request, response, status, body_Obj, rsc, ri, c
                 }
             }
 
+            // if the request is POST and resource is /cnt-state,
+
+            
             response.status(status).end(bodyString);
 
             var rspObj = {};

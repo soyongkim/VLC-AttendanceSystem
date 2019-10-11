@@ -50,6 +50,11 @@ var security = require('./security');
 
 var db_sql = require('./sql_action');
 
+console.log = require('debug')('hidden:ps_ae');
+const debug = require('debug')('viip:resource_bebug');
+
+var is_app = require('../viip/ps_app');
+
 var _this = this;
 
 global.ty_list = ['1', '2', '3', '4', '5', '9', '10', '13', '14', '16', '17', '23', '24', '27', '29', '30', '38', '39'];
@@ -1501,6 +1506,13 @@ function build_resource(request, response, ty, body_Obj, callback) {
 
 exports.create = function (request, response, ty, body_Obj, callback) {
     var rootnm = request.headers.rootnm;
+     //debug(`----------------------------Request Object------------------------------`);
+     //debug(`${util.inspect(request.headers)}`);
+     //debug(`----------------------------Response Object------------------------------`);
+     //debug(`${util.inspect(response)}`);
+     //debug(`----------------------------body Object------------------------------`);
+     //debug(`${util.inspect(body_Obj)}`);
+
     build_resource(request, response, ty, body_Obj, function (rsc, resource_Obj) {
         if (rsc == '0') {
             callback(rsc);
@@ -1565,6 +1577,8 @@ exports.create = function (request, response, ty, body_Obj, callback) {
                         }
 
                         if (Object.keys(create_Obj)[0] == 'req') {
+                            // checking all post response
+                            debug("- keys == req")
                             request.headers.tg = create_Obj[rootnm].ri.replace('/', '');
                             status_code = 202;
                             rsc_code = 1000;
@@ -1578,6 +1592,7 @@ exports.create = function (request, response, ty, body_Obj, callback) {
                         }
 
                         if (request.query.rcn == 2) { // hierarchical address
+                            debug("- rcn == 2")
                             status_code = 201;
                             rsc_code = 2001;
                             request.headers.rootnm = 'uri';
@@ -1590,6 +1605,7 @@ exports.create = function (request, response, ty, body_Obj, callback) {
                             return 0;
                         }
                         else if (request.query.rcn == 3) { // hierarchical address and attributes
+                            debug("- rcn == 3")
                             status_code = 201;
                             rsc_code = 2001;
                             request.headers.rootnm = rootnm;
@@ -1603,7 +1619,50 @@ exports.create = function (request, response, ty, body_Obj, callback) {
                             return '0';
                         }
                         else {
-                            responder.response_result(request, response, status_code, create_Obj, rsc_code, create_Obj[rootnm].ri, '');
+                            // change con in cin
+                            var route = 0
+                            if(url.parse(create_Obj[rootnm].pi).pathname.split('/')[2] == 'cnt-ps-key' && create_Obj[rootnm].ty == 4) {
+                                debug(`[ROUTE CIN START]: pi(${JSON.stringify(create_Obj[rootnm].pi)})`);
+                                if(typeof create_Obj[rootnm].con.sid !== 'undefined') {
+                                    debug(`[ROUTE]: Student sent this message for check`);
+                                    debug(`- con.key:${create_Obj[rootnm].con.key} - ps_key:${ps_key}`);
+                                    if(create_Obj[rootnm].con.key == ps_key) {
+                                        debug(`[ROUTE]: Available key`);
+                                        route = 1
+                                        db_sql.select_latest_check(0, create_Obj[rootnm].con.sid).then((res)=> {
+                                            debug(`-res_con:${JSON.stringify(res)}`)
+                                            if(res.con == "o") {
+                                                // change con
+                                                debug(`[ROUTE]: Already checked`);
+                                                create_Obj[rootnm].con = "already_success";
+                                            } else {
+                                                debug(`[ROUTE]: Success`);
+                                                // create con{check : "o"} in cin
+                                                var cnt = `/Mobius/std_${res.sid}/cnt-state`;
+                                                // 동기적으로 cin 만들고 success 처리를 해야함. 일단 보류
+                                                //is_app.create_cin_local(cnt, "o");
+                                                // change con
+                                                create_Obj[rootnm].con = "success";
+                                            }
+                                            responder.response_result(request, response, status_code, create_Obj, rsc_code, create_Obj[rootnm].ri, '');
+                                            callback(rsc);
+                                            route = 0
+                                            return '0';
+                                        });
+                                    } else {
+                                        debug(`[ROUTE]: Not available key`);
+                                        create_Obj[rootnm].con = "fail";
+                                    }
+                                }
+                                else {
+                                    debug(`[ROUTE]: Manager sent this message to start or stop checking`);
+                                    is_app.generate_key(create_Obj[rootnm].con);
+                                }
+                            } else if(url.parse(create_Obj[rootnm].pi).pathname.split('/')[2] == 'cnt-museum' && create_Obj[rootnm].ty == 4) {
+                                
+                            }
+                            if(route == 0)
+                                responder.response_result(request, response, status_code, create_Obj, rsc_code, create_Obj[rootnm].ri, '');
                             callback(rsc);
                             return '0';
                         }

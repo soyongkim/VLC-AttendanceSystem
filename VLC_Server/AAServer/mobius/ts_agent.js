@@ -28,7 +28,6 @@ var moment = require('moment');
 
 var db_sql = require('./sql_action');
 
-var debug = require('debug')('viip:gw');
 // ������ �����մϴ�.
 var ts_app = express();
 
@@ -39,8 +38,7 @@ if(usesecure == 'disable') {
 
         // Searching TS with missingDetect. if it is TRUE, restart mdt
         init_TS(function (rsc) {
-            //console.log('init_TS - ' + rsc);
-            debug('Gateway Ready');
+            console.log('init_TS - ' + rsc);
         });
     });
 }

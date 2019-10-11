@@ -18,8 +18,6 @@ var mysql = require('mysql');
 
 var mysql_pool = null;
 
-console.log = require('debug')('hidden:log');
-console.error = require('debug')('viip:error');
 //var _this = this;
 
 
@@ -77,3 +75,5 @@ exports.getResult = function(query, db_Obj, callback) {
         }
     });
 };
+
+

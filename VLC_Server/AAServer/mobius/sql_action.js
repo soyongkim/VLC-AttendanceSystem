@@ -20,6 +20,8 @@ var fs = require('fs');
 
 var db = require('./db_action');
 
+const debug = require('debug')('viip:ps_ae');
+
 var _this = this;
 
 global.max_lim = 1000;
@@ -819,6 +821,7 @@ exports.select_csr = function(ri, callback) {
         callback(err, results_csr);
     });
 };
+
 
 exports.select_ae = function(ri, callback) {
     var sql = util.format("select * from ae where ri = \'%s\'", ri);
@@ -2077,8 +2080,6 @@ exports.select_sum_ae = function(callback) {
     });
 };
 
-
-// For Attendance system
 exports.select_list_std = function(callback) {
     var tid = require('shortid').generate();
     console.time('select_sum_std ' + tid);
