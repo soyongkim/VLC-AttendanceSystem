@@ -68,7 +68,7 @@ class AttendanceStudentActivity : AppCompatActivity() {
                         //updateReceivedData(data)
                         //Toast.makeText(this@AttendanceStudentActivity, HexDump.toHexString(rcvdData), Toast.LENGTH_LONG).show()
                         //For Debugging the VLC data
-                        Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(this@AttendanceStudentActivity, "recv_id:$rcvdId\nrecv_Type:$rcvdType\nData:${HexDump.dumpHexString(data)}\n", Toast.LENGTH_SHORT).show()
                         //updateReceivedData(data)
 
                         processVLCdata()
