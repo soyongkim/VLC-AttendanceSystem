@@ -14,6 +14,7 @@ import com.example.soyongkim.vlc_receiver.R
 import com.example.soyongkim.vlc_receiver.controller.util.HttpResponseEventRouter
 import com.example.soyongkim.vlc_receiver.model.onem2m.CSEBase
 import com.example.soyongkim.vlc_receiver.model.service.HttpRequestService
+import com.example.soyongkim.vlc_receiver.controller.util.PermissonAllow
 import java.util.*
 
 class InitActivity : AppCompatActivity() {
@@ -98,13 +99,14 @@ class InitActivity : AppCompatActivity() {
         }, 200)
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_init)
 
         btn_ipAddress = findViewById(R.id.btn_ipAddress)
         edit_ipAddress = findViewById(R.id.edit_ipAddress)
+
+        PermissonAllow.setupPermissions(this)
 
         var intent = Intent(this, HttpRequestService::class.java)
         startService(intent)
