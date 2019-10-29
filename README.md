@@ -91,5 +91,27 @@ nodejs mobius
 - 주의사항
   - 한 번에 2개의 VT만 USB로 연결 가능
   - VT 아이디가 0, 1로 구성되어 있음 (ex video_vt0.mp4)
-  - 안드로이드 앱은 그냥 그대로 apk깔고 실행하면 됨
+  - 클라이언트 앱은 apk를 설치하거나, VLC-Receiver를 빌드하고 설치 
+
+
+
+
+
+## VLC Receiver(클라이언트) 사용법
+
+### 가시광 통신 출결 시스템
+
+![1572344617994](.README.assets/1572344617994.png)
+
+
+
+### 가시광 통신 박물관 시스템
+
+![1572344642457](.README.assets/1572344642457.png)
+
+
+
+* 자세한 사용법은 영상을 참조.
+
+<video src="VLC-Demo-Video-Final.mp4"></video>
 
